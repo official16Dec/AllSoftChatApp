@@ -26,23 +26,5 @@ public class MainView extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("enduser");
-
-
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                EndUser value = dataSnapshot.getValue(EndUser.class);
-                Log.d(TAG, "Value is: " + value.getUserName());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-
     }
 }

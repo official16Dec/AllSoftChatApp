@@ -6,14 +6,17 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentLoginBinding;
+import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
 import com.allsoft.chatapp.ui.dashboard.MainView;
 import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
@@ -39,6 +42,8 @@ public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
 
     private LoginViewModel loginViewModel;
+
+    private RealDatabaseManager realDatabaseManager;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -84,7 +89,17 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initViewModel();
+        setObserver();
         setListener();
+    }
+
+    private void setObserver() {
+        loginViewModel.getManager().observe(getViewLifecycleOwner(), new Observer<RealDatabaseManager>() {
+            @Override
+            public void onChanged(RealDatabaseManager realManager) {
+                realDatabaseManager = realManager;
+            }
+        });
     }
 
     private void initViewModel() {
@@ -92,12 +107,18 @@ public class LoginFragment extends Fragment {
 
     }
 
+
+
     private void setListener() {
         binding.signInBtn.setOnClickListener(view -> {
 
             if(validateLogin()){
-                RealDatabaseManager realDatabaseManager = new RealDatabaseManager();
-                realDatabaseManager.getEndUserById(1);
+                if(realDatabaseManager.loginUser(binding.userMobileEdit.getText().toString(), binding.userPassEdit.getText().toString())){
+                    loginViewModel.setMainView(new HashMap<>());
+                }
+                else{
+                    Toast.makeText(requireContext(), "Invalid login credentials", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

@@ -17,6 +17,7 @@ import com.allsoft.chatapp.ui.auth.fragments.LoginFragment;
 import com.allsoft.chatapp.ui.auth.fragments.SignUpFragment;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
 import com.allsoft.chatapp.ui.dashboard.MainView;
+import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
 
 import java.util.HashMap;
 
@@ -25,6 +26,8 @@ public class LoginView extends AppCompatActivity {
     private LoginViewModel loginViewModel;
 
     private ActivityLoginBinding binding;
+
+    RealDatabaseManager realDatabaseManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,10 +38,14 @@ public class LoginView extends AppCompatActivity {
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
+        realDatabaseManager = new RealDatabaseManager(this);
+
         setObserver();
 
 
         loginViewModel.setLoginLiveData(new HashMap<>());
+
+        loginViewModel.setManager(realDatabaseManager);
 
     }
 
