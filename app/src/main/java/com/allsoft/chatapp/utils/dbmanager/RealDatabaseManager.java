@@ -29,7 +29,7 @@ public class RealDatabaseManager {
     private JSONObject allDataObj;
     private final DatabaseReference databaseReference;
 
-    private MySharedPref mySharedPref;
+    private final MySharedPref mySharedPref;
 
     public RealDatabaseManager(Context context){
         mySharedPref = new MySharedPref(context);
@@ -49,7 +49,9 @@ public class RealDatabaseManager {
 
                         allDataObj = new JSONObject(json);
 
-                        Log.d(TAG, "All Value"+allDataObj.getJSONObject("endusers"));
+                        databaseCallback.databaseLoadingCallback();
+
+//                        Log.d(TAG, "All Value"+allDataObj.getJSONObject("endusers"));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -139,5 +141,14 @@ public class RealDatabaseManager {
         }
         return userData;
 
+    }
+
+    public interface DatabaseCallback{
+        void databaseLoadingCallback();
+    }
+
+    private DatabaseCallback databaseCallback;
+    public void setDatabaseCallback(DatabaseCallback callback){
+        databaseCallback = callback;
     }
 }
