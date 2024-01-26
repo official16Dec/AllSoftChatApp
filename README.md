@@ -1,0 +1,2 @@
+# AllSoftChatApp
+An android application
