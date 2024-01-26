@@ -11,15 +11,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class RealDatabaseManager {
 
 
     private String TAG = RealDatabaseManager.class.getSimpleName();
-    public final static String userTable = "enduser";
+    public final static String chatapp = "chatapp";
     private DatabaseReference databaseReference;
-    RealDatabaseManager(){
+    public RealDatabaseManager(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference(userTable);
+        databaseReference = database.getReference(chatapp);
     }
 
     public void registerUser(EndUser endUser){
@@ -29,15 +32,16 @@ public class RealDatabaseManager {
 
 
     EndUser endUser = null;
-    public EndUser getUser(){
+    public EndUser getEndUserById(int userId){
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                endUser = dataSnapshot.getValue(EndUser.class);
-                Log.d(TAG, "Value is: " + endUser);
+                JSONObject jObj;
+                //                    jObj = new JSONObject(dataSnapshot.toString());
+                Log.d(TAG, "Value is: " + dataSnapshot.getValue());
             }
 
             @Override

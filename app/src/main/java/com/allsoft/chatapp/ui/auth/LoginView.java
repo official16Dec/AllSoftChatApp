@@ -1,5 +1,6 @@
 package com.allsoft.chatapp.ui.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import com.allsoft.chatapp.databinding.ActivityLoginBinding;
 import com.allsoft.chatapp.ui.auth.fragments.LoginFragment;
 import com.allsoft.chatapp.ui.auth.fragments.SignUpFragment;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
+import com.allsoft.chatapp.ui.dashboard.MainView;
 
 import java.util.HashMap;
 
@@ -51,6 +53,13 @@ public class LoginView extends AppCompatActivity {
             SignUpFragment signUpFragment = SignUpFragment.newInstance("", "");
             loadFragment(signUpFragment, SignUpFragment.class.getSimpleName());
         });
+
+        loginViewModel.getMainView().observe(this, stringObjectHashMap -> startMain());
+    }
+
+    private void startMain() {
+        startActivity(new Intent(this, MainView.class));
+        finish();
     }
 
 

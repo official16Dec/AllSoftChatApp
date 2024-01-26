@@ -28,4 +28,15 @@ public class LoginViewModel extends ViewModel {
     public void setSignUpLiveData(HashMap<String, Object> signUpData){
         signUpLiveData.setValue(signUpData);
     }
+
+
+    private final MutableLiveData<HashMap<String, Object>> mainViewLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getMainView(){
+        return mainViewLiveData;
+    }
+
+    public void setMainView(HashMap<String, Object> loginData){
+        mainViewLiveData.setValue(loginData);
+    }
 }

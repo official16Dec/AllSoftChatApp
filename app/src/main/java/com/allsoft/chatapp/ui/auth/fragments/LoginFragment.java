@@ -16,6 +16,7 @@ import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentLoginBinding;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
 import com.allsoft.chatapp.ui.dashboard.MainView;
+import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
 
 import java.util.HashMap;
 
@@ -95,25 +96,16 @@ public class LoginFragment extends Fragment {
         binding.signInBtn.setOnClickListener(view -> {
 
             if(validateLogin()){
-                startMain();
+                RealDatabaseManager realDatabaseManager = new RealDatabaseManager();
+                realDatabaseManager.getEndUserById(1);
             }
         });
 
-        binding.signUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openRegisterUser();
-            }
-        });
+        binding.signUpBtn.setOnClickListener(view -> openRegisterUser());
     }
 
     private void openRegisterUser() {
         loginViewModel.setSignUpLiveData(new HashMap<>());
-    }
-
-    private void startMain() {
-        requireActivity().startActivity(new Intent(requireActivity(), MainView.class));
-        requireActivity().finish();
     }
 
     private boolean validateLogin() {

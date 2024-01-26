@@ -17,8 +17,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="W, 1:1"
-        app:layout_constraintWidth_percent="0.5"
-        app:layout_constraintVertical_bias="0.21"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintVertical_bias="0.15"
         app:srcCompat="@drawable/user_signup"
 
         />
@@ -38,8 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/userNameEdit"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEF"
-            android:inputType="phone"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,7 +49,7 @@
         android:id="@+id/userMobileInputLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/loginLogo"
+        app:layout_constraintTop_toBottomOf="@id/userNameInputLayout"
         android:layout_margin="20dp"
         android:hint="Mobile No"
         style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense"
@@ -66,12 +66,31 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/userPassInputLayout"
+        android:id="@+id/userMailInputLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userMobileInputLayout"
         android:layout_margin="20dp"
-        android:hint="Password"
+        android:hint="Mobile No"
+        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense"
+        >
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/userMailEdit"
+            android:inputType="textEmailAddress"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/userPassInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userMailInputLayout"
+        android:layout_margin="20dp"
+        android:hint="Create Password"
         app:passwordToggleEnabled="true"
         style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense"
         >
@@ -84,41 +103,7 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/grey"
-        android:id="@+id/alreadyAccountLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userPassInputLayout"
-        android:layout_margin="16dp"
-        android:textSize="12sp"
-        android:text="Already have an account, Please sign in"/>
 
-    <Button
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/signInBtn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alreadyAccountLabel"
-        android:layout_margin="20dp"
-        android:text="Sign In"
-        />
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/grey"
-        android:id="@+id/dontHaveAccountLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/signInBtn"
-        android:layout_margin="16dp"
-        android:textSize="12sp"
-        android:text="Don't have account, Please sign up"/>
 
     <Button
         android:layout_width="0dp"
@@ -126,7 +111,7 @@
         android:id="@+id/signUpBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dontHaveAccountLabel"
+        app:layout_constraintTop_toBottomOf="@id/userPassInputLayout"
         android:layout_margin="20dp"
         android:text="Sign Up"
         android:backgroundTint="@color/orange"
