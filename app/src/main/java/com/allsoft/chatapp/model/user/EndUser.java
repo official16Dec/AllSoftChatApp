@@ -10,6 +10,7 @@ public class EndUser {
     public String user_name;
     public String user_mobile;
     public String user_mail;
+    public String user_password;
 
 
 //    EndUser(int user_id, String user_name, String user_mobile, String user_mail){
@@ -34,6 +35,9 @@ public class EndUser {
     public String getUserMail(){
         return user_mail;
     }
+    public String getUserPassword(){
+        return user_password;
+    }
 
     public void setUserId(int user_id){
         this.user_id = user_id;
@@ -47,5 +51,8 @@ public class EndUser {
 
     public void setUserMobile(String user_mobile){
         this.user_mobile = user_mobile;
+    }
+    public void setUserPassword(String user_password){
+        this.user_password = user_password;
     }
 }

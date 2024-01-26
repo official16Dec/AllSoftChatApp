@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
+
 import java.util.HashMap;
 
 public class LoginViewModel extends ViewModel {
@@ -38,5 +40,15 @@ public class LoginViewModel extends ViewModel {
 
     public void setMainView(HashMap<String, Object> loginData){
         mainViewLiveData.setValue(loginData);
+    }
+
+    private final MutableLiveData<RealDatabaseManager> realDatabaseManagerLiveData = new MutableLiveData<>();
+
+    public LiveData<RealDatabaseManager> getManager(){
+        return realDatabaseManagerLiveData;
+    }
+
+    public void setManager(RealDatabaseManager realDatabaseManager){
+        realDatabaseManagerLiveData.setValue(realDatabaseManager);
     }
 }

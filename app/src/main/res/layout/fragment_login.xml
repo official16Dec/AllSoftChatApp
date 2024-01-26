@@ -39,6 +39,9 @@
             android:id="@+id/userMobileEdit"
             android:digits="0123456789"
             android:inputType="phone"
+            android:maxLength="10"
+            android:minLines="1"
+            android:maxLines="1"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -59,7 +62,8 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:id="@+id/userPassEdit"
-            android:maxLength="10"
+            android:minLines="1"
+            android:maxLines="1"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
