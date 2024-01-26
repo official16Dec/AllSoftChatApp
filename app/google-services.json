@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138409805914",
+    "project_id": "allsoftchatapp",
+    "storage_bucket": "allsoftchatapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138409805914:android:3d1d2d959ea878a258f063",
+        "android_client_info": {
+          "package_name": "com.allsoft.chatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtc98SMMO5S_EiscwwHvxBcnDtlgNFgT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
