@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class MainViewModel extends ViewModel {
 
-    private MutableLiveData<HashMap<String, Object>> chatGroupLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HashMap<String, Object>> chatGroupLiveData = new MutableLiveData<>();
 
     public LiveData<HashMap<String, Object>> getChatGroupLiveData(){
         return chatGroupLiveData;
@@ -19,7 +19,7 @@ public class MainViewModel extends ViewModel {
     }
 
 
-    private MutableLiveData<HashMap<String, Object>> chatDetailLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HashMap<String, Object>> chatDetailLiveData = new MutableLiveData<>();
 
     public LiveData<HashMap<String, Object>> getChatDetailLiveData(){
         return chatDetailLiveData;
@@ -27,5 +27,25 @@ public class MainViewModel extends ViewModel {
 
     public void setChatDetailLiveData(HashMap<String, Object> chatData){
         chatDetailLiveData.setValue(chatData);
+    }
+
+    private final MutableLiveData<HashMap<String, Object>> refreshChatHistoryLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getRefreshChatHistoryLiveData(){
+        return refreshChatHistoryLiveData;
+    }
+
+    public void setRefreshChatHistoryLiveData(HashMap<String, Object> chatHistoryData){
+        refreshChatHistoryLiveData.setValue(chatHistoryData);
+    }
+
+    private final MutableLiveData<HashMap<String, Object>> chatAdapterLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getChatAdapterLiveData(){
+        return chatAdapterLiveData;
+    }
+
+    public void setChatAdapterLiveData(HashMap<String, Object> chatHistoryData){
+        chatAdapterLiveData.setValue(chatHistoryData);
     }
 }
