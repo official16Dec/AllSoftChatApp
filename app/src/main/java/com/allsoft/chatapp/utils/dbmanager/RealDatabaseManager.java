@@ -49,7 +49,7 @@ public class RealDatabaseManager {
 
                         allDataObj = new JSONObject(json);
 
-                        databaseCallback.databaseLoadingCallback();
+                        databaseCallback.databaseLoadingCallback(allDataObj);
 
 //                        Log.d(TAG, "All Value"+allDataObj.getJSONObject("endusers"));
 
@@ -144,7 +144,7 @@ public class RealDatabaseManager {
     }
 
     public interface DatabaseCallback{
-        void databaseLoadingCallback();
+        void databaseLoadingCallback(JSONObject result);
     }
 
     private DatabaseCallback databaseCallback;
