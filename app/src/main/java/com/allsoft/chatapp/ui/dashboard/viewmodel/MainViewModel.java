@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.allsoft.chatapp.model.chats.UserChat;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainViewModel extends ViewModel {
@@ -39,13 +42,13 @@ public class MainViewModel extends ViewModel {
         refreshChatHistoryLiveData.setValue(chatHistoryData);
     }
 
-    private final MutableLiveData<HashMap<String, Object>> chatAdapterLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HashMap<String, ArrayList<UserChat>>> chatAdapterLiveData = new MutableLiveData<>();
 
-    public LiveData<HashMap<String, Object>> getChatAdapterLiveData(){
+    public LiveData<HashMap<String, ArrayList<UserChat>>> getChatAdapterLiveData(){
         return chatAdapterLiveData;
     }
 
-    public void setChatAdapterLiveData(HashMap<String, Object> chatHistoryData){
+    public void setChatAdapterLiveData(HashMap<String, ArrayList<UserChat>> chatHistoryData){
         chatAdapterLiveData.setValue(chatHistoryData);
     }
 }

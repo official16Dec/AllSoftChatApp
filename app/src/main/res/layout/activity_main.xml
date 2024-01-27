@@ -4,50 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_purple"
     tools:context=".ui.dashboard.MainView">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/titleBarLayout"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/bottom_curved_white_filled_rectangle">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/backBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="W, 1:1"
+            app:layout_constraintWidth_percent="0.1"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_back"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:background="@drawable/bottom_curved_white_filled_rectangle">
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:id="@+id/backBtn"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="W, 1:1"
-                app:layout_constraintWidth_percent="0.1"
-                android:padding="10dp"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_back"/>
+            app:layout_constraintTop_toTopOf="@id/backBtn"
+            app:layout_constraintBottom_toBottomOf="@id/backBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Chat History"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/backBtn"
-                app:layout_constraintBottom_toBottomOf="@id/backBtn"
-                app:layout_constraintStart_toEndOf="@id/backBtn"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="Chat History"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:textSize="16sp"
-
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:layout_width="0dp"

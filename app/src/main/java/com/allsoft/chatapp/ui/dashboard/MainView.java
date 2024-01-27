@@ -31,8 +31,11 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class MainView extends AppCompatActivity {
 
@@ -64,10 +67,13 @@ public class MainView extends AppCompatActivity {
 
 
     private void refreshChat() {
-        RealDatabaseManager realDatabaseManager = new RealDatabaseManager(this);
-        realDatabaseManager.setDatabaseCallback(result -> {
-            manageChatHistory(result);
+        RealDatabaseManager realDatabaseManager = new RealDatabaseManager(this, new RealDatabaseManager.DatabaseCallback() {
+            @Override
+            public void databaseLoadingCallback(JSONObject result) {
+                manageChatHistory(result);
+            }
         });
+
     }
 
     private void manageChatHistory(JSONObject result) {
@@ -78,19 +84,23 @@ public class MainView extends AppCompatActivity {
             Iterator<String> keys = chatData.keys();
             while(keys.hasNext()){
                 String key = keys.next();
-                JSONObject chatObj = chatData.getJSONObject(key);
-                String endUsers = chatObj.getString("end_users");
-                String[] splitUser = endUsers.split("V");
-                if(splitUser.length > 0){
-                    if(Integer.parseInt(splitUser[0]) == mySharedPref.getPrefUserId(MySharedPref.prefUserId) || Integer.parseInt(splitUser[1]) == mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
+                JSONObject groupData = chatData.getJSONObject(key);
+
+                Iterator<String> groupKeys = groupData.keys();
+                while(groupKeys.hasNext()){
+                    String groupKey = groupKeys.next();
+                    JSONObject conversationData = groupData.getJSONObject(groupKey);
+
+                    if(conversationData.getInt("sender") == mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
                         Gson gson = new Gson();
-                        UserChat userChat = gson.fromJson(chatObj.toString(), UserChat.class);
+                        UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
                         userChatList.add(userChat);
                     }
                 }
             }
 
-            HashMap<String, Object> chatHistoryData = new HashMap<>();
+            Log.d(TAG, "Size is "+userChatList.size());
+            HashMap<String, ArrayList<UserChat>> chatHistoryData = new HashMap<>();
             chatHistoryData.put("chatList", userChatList);
             mainViewModel.setChatAdapterLiveData(chatHistoryData);
 

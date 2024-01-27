@@ -22,14 +22,16 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserCh
     private final Context mContext;
     private final ChatHistoryCallback chatHistoryCallback;
 
-    private ArrayList<UserChat> chatList;
+    private ArrayList<UserChat> groupChatList;
     public UserChatAdapter(Context mContext, ChatHistoryCallback chatHistoryCallback){
         this.mContext = mContext;
         this.chatHistoryCallback = chatHistoryCallback;
+
+        groupChatList = new ArrayList<>();
     }
 
     public void updateChat(ArrayList<UserChat> chatList){
-        chatList.addAll(chatList);
+        groupChatList.addAll(groupChatList.size(), chatList);
         notifyDataSetChanged();
     }
     @NonNull
@@ -42,20 +44,19 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserCh
     @Override
     public void onBindViewHolder(@NonNull UserChatViewHolder holder, int position) {
         holder.chatImage.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.ic_launcher));
-        holder.chatTitle.setText(chatList.get(position).getEndUsers());
-        holder.chatDescription.setText(chatList.get(position).getMessage());
+        holder.chatTitle.setText(groupChatList.get(position).getChatTitle());
+        holder.chatDescription.setText(groupChatList.get(position).getChatDesc());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return groupChatList.size();
     }
 
     class UserChatViewHolder extends RecyclerView.ViewHolder{
 
         private ImageView chatImage;
         private TextView chatTitle;
-
         private TextView chatDescription;
         public UserChatViewHolder(@NonNull ItemChatGroupBinding itemView) {
             super(itemView.getRoot());
@@ -68,7 +69,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserCh
         }
 
         public void bindView(){
-            itemView.setOnClickListener(view -> chatHistoryCallback.setHistoryItemClicked(chatList.get(getAdapterPosition())));
+            itemView.setOnClickListener(view -> chatHistoryCallback.setHistoryItemClicked(groupChatList.get(getAdapterPosition())));
         }
     }
 

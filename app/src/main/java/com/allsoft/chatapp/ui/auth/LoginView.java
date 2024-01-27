@@ -19,6 +19,8 @@ import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
 import com.allsoft.chatapp.ui.dashboard.MainView;
 import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 
 public class LoginView extends AppCompatActivity {
@@ -38,7 +40,12 @@ public class LoginView extends AppCompatActivity {
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        realDatabaseManager = new RealDatabaseManager(this);
+        realDatabaseManager = new RealDatabaseManager(this, new RealDatabaseManager.DatabaseCallback() {
+            @Override
+            public void databaseLoadingCallback(JSONObject result) {
+
+            }
+        });
 
         setObserver();
 

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.allsoft.chatapp.ui.dashboard.chatGroup.adapter.UserChatAdapter;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -39,6 +41,8 @@ public class ChatGroupFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private String TAG = "";
 
     private FragmentChatGroupBinding binding;
 
@@ -94,17 +98,24 @@ public class ChatGroupFragment extends Fragment {
         initViewModel();
 
         setObserver();
+
+        setProgressVisibility(false);
     }
 
     private void setObserver() {
 
-        mainViewModel.getChatAdapterLiveData().observe(getViewLifecycleOwner(), new Observer<HashMap<String, Object>>() {
+        mainViewModel.getChatAdapterLiveData().observe(getViewLifecycleOwner(), new Observer<HashMap<String, ArrayList<UserChat>>>() {
             @Override
-            public void onChanged(HashMap<String, Object> stringObjectHashMap) {
+            public void onChanged(HashMap<String, ArrayList<UserChat>> stringObjectHashMap) {
+
                 if(stringObjectHashMap.containsKey("chatList")){
+                    setProgressVisibility(true);
                     ArrayList<UserChat> chatList = new ArrayList<>();
-                    chatList.addAll((ArrayList)stringObjectHashMap.get("chatList"));
-                    userChatAdapter.updateChat(chatList);
+                    Log.d(TAG, "List is "+stringObjectHashMap.get("chatList"));
+                    chatList.addAll(stringObjectHashMap.get("chatList"));
+                    if (chatList.size() > 0) {
+                        userChatAdapter.updateChat(chatList);
+                    }
                 }
             }
         });
@@ -124,5 +135,16 @@ public class ChatGroupFragment extends Fragment {
             }
         });
         binding.userChatRecycler.setAdapter(userChatAdapter);
+    }
+
+    private void setProgressVisibility(boolean shouldVisible){
+        if(shouldVisible){
+            binding.userChatRecycler.setVisibility(View.VISIBLE);
+            binding.chatGroupShimmerLayout.getRoot().setVisibility(View.GONE);
+        }
+        else{
+            binding.userChatRecycler.setVisibility(View.GONE);
+            binding.chatGroupShimmerLayout.getRoot().setVisibility(View.VISIBLE);
+        }
     }
 }
