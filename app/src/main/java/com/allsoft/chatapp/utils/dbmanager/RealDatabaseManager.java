@@ -31,7 +31,7 @@ public class RealDatabaseManager {
 
     private final MySharedPref mySharedPref;
 
-    public RealDatabaseManager(Context context){
+    public RealDatabaseManager(Context context, DatabaseCallback databaseCallback){
         mySharedPref = new MySharedPref(context);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -147,8 +147,8 @@ public class RealDatabaseManager {
         void databaseLoadingCallback(JSONObject result);
     }
 
-    private DatabaseCallback databaseCallback;
-    public void setDatabaseCallback(DatabaseCallback callback){
-        databaseCallback = callback;
-    }
+//    private DatabaseCallback databaseCallback;
+//    public void setDatabaseCallback(DatabaseCallback callback){
+//        databaseCallback = callback;
+//    }
 }

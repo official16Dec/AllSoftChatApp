@@ -10,19 +10,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentChatGroupBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
-import com.allsoft.chatapp.ui.dashboard.MainView;
-import com.allsoft.chatapp.ui.dashboard.chatGroup.adapter.UserChatAdapter;
+import com.allsoft.chatapp.ui.dashboard.chatGroup.adapter.UserChatGroupAdapter;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,11 +40,13 @@ public class ChatGroupFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private String TAG = "";
+
     private FragmentChatGroupBinding binding;
 
     private MainViewModel mainViewModel;
 
-    private UserChatAdapter userChatAdapter;
+    private UserChatGroupAdapter userChatGroupAdapter;
 
     public ChatGroupFragment() {
         // Required empty public constructor
@@ -94,17 +96,21 @@ public class ChatGroupFragment extends Fragment {
         initViewModel();
 
         setObserver();
+
+        setProgressVisibility(false);
     }
 
     private void setObserver() {
 
-        mainViewModel.getChatAdapterLiveData().observe(getViewLifecycleOwner(), new Observer<HashMap<String, Object>>() {
-            @Override
-            public void onChanged(HashMap<String, Object> stringObjectHashMap) {
-                if(stringObjectHashMap.containsKey("chatList")){
-                    ArrayList<UserChat> chatList = new ArrayList<>();
-                    chatList.addAll((ArrayList)stringObjectHashMap.get("chatList"));
-                    userChatAdapter.updateChat(chatList);
+        mainViewModel.getChatGroupAdapterLiveData().observe(getViewLifecycleOwner(), stringObjectHashMap -> {
+
+            if(stringObjectHashMap.containsKey("chatList")){
+                setProgressVisibility(true);
+                ArrayList<UserChat> chatList = new ArrayList<>();
+                Log.d(TAG, "List is "+stringObjectHashMap.get("chatList"));
+                chatList.addAll(stringObjectHashMap.get("chatList"));
+                if (chatList.size() > 0) {
+                    userChatGroupAdapter.updateChat(chatList);
                 }
             }
         });
@@ -117,12 +123,26 @@ public class ChatGroupFragment extends Fragment {
     private void initUserChatAdapter() {
         binding.userChatRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
 
-        userChatAdapter = new UserChatAdapter(requireActivity(), new UserChatAdapter.ChatHistoryCallback() {
+        userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), new UserChatGroupAdapter.ChatHistoryCallback() {
             @Override
             public void setHistoryItemClicked(UserChat userChat) {
-
+                HashMap mapData = new HashMap<String, Object>();
+                mapData.put("endusers", userChat.getEndUsers());
+                mainViewModel.setChatDetailLiveData(mapData);
             }
         });
-        binding.userChatRecycler.setAdapter(userChatAdapter);
+
+        binding.userChatRecycler.setAdapter(userChatGroupAdapter);
+    }
+
+    private void setProgressVisibility(boolean shouldVisible){
+        if(shouldVisible){
+            binding.userChatRecycler.setVisibility(View.VISIBLE);
+            binding.chatGroupShimmerLayout.getRoot().setVisibility(View.GONE);
+        }
+        else{
+            binding.userChatRecycler.setVisibility(View.GONE);
+            binding.chatGroupShimmerLayout.getRoot().setVisibility(View.VISIBLE);
+        }
     }
 }

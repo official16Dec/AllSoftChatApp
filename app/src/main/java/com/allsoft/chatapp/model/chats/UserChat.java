@@ -1,49 +1,59 @@
 package com.allsoft.chatapp.model.chats;
 
 public class UserChat {
-    private String end_users;
-    private String message;
-    private String media_audio;
-    private String media_photo;
-    private String media_video;
+    private String endusers;
+    private int sender;
+    private String chat_desc;
+    private String chat_title;
+    private String when;
+
+    private ChatData chat;
 
     public String getEndUsers(){
-        return end_users;
+        return endusers;
     }
 
     public void setEndUsers(String end_users){
-        this.end_users = end_users;
+        this.endusers = end_users;
     }
 
-    public String getMessage(){
-        return message;
+    public String getChatTitle(){
+        return chat_title;
     }
 
-    public void setMessage(String message){
-        this.message = message;
+    public void setChatTitle(String chat_title){
+        this.chat_title = chat_title;
     }
 
-    public String getMediaPhoto(){
-        return media_photo;
+    public String getChatDesc(){
+        return chat_desc;
     }
 
-    public void setMediaPhoto(String media_photo){
-        this.media_photo = media_photo;
+    public void setChatDesc(String chat_desc){
+        this.chat_desc = chat_desc;
     }
 
-    public String getMediaAudio(){
-        return media_audio;
+    public int getSender(){
+        return sender;
     }
 
-    public void setMediaAudio(String media_audio){
-        this.media_audio = media_audio;
+    public void setSender(int sender){
+        this.sender = sender;
     }
 
-    public String getMediaVideo(){
-        return media_video;
+    public String getWhen(){
+        return when;
     }
 
-    public void setMediaVideo(String media_video){
-        this.media_video = media_video;
+    public void setWhen(String when){
+        this.when = when;
+    }
+
+    public ChatData getChat(){
+        return chat;
+    }
+
+    public void setChat(ChatData chat){
+        this.chat = chat;
     }
 }

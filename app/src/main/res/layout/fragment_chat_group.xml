@@ -6,6 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.dashboard.chatGroup.ChatGroupFragment"
     android:background="@color/light_purple"
+    android:clickable="true"
+    android:focusable="true"
     >
 
     <androidx.constraintlayout.widget.Guideline
@@ -13,7 +15,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/guideTop"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.03"
+        app:layout_constraintGuide_percent="0.02"
         />
 
     <androidx.constraintlayout.widget.Guideline
@@ -37,14 +39,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/guideBottom"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.97"
+        app:layout_constraintGuide_percent="0.98"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/userChatRecycler"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintEnd_toEndOf="@id/guideEnd"
         app:layout_constraintTop_toTopOf="@id/guideTop"
@@ -55,7 +57,9 @@
     <include
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:id="@+id/chatGroupShimmerLayout"
         layout="@layout/chat_group_shimmer"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintEnd_toEndOf="@id/guideEnd"
         app:layout_constraintTop_toTopOf="@id/guideTop"
