@@ -2,7 +2,6 @@ package com.allsoft.chatapp.ui.dashboard.chatGroup.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,13 +16,13 @@ import com.allsoft.chatapp.model.chats.UserChat;
 
 import java.util.ArrayList;
 
-public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserChatViewHolder> {
+public class UserChatGroupAdapter extends RecyclerView.Adapter<UserChatGroupAdapter.UserChatViewHolder> {
 
     private final Context mContext;
     private final ChatHistoryCallback chatHistoryCallback;
 
     private ArrayList<UserChat> groupChatList;
-    public UserChatAdapter(Context mContext, ChatHistoryCallback chatHistoryCallback){
+    public UserChatGroupAdapter(Context mContext, ChatHistoryCallback chatHistoryCallback){
         this.mContext = mContext;
         this.chatHistoryCallback = chatHistoryCallback;
 

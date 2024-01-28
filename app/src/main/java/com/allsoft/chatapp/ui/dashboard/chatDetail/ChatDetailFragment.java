@@ -1,14 +1,28 @@
 package com.allsoft.chatapp.ui.dashboard.chatDetail;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.allsoft.chatapp.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.allsoft.chatapp.databinding.FragmentChatDetailBinding;
+import com.allsoft.chatapp.model.chats.UserChat;
+import com.allsoft.chatapp.ui.dashboard.chatDetail.adapter.UserChatDetailAdapter;
+import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,12 +33,19 @@ public class ChatDetailFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private final String TAG = ChatDetailFragment.class.getSimpleName();
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private FragmentChatDetailBinding binding;
+
+    private MainViewModel mainViewModel;
+
+    private UserChatDetailAdapter userChatDetailAdapter;
 
     public ChatDetailFragment() {
         // Required empty public constructor
@@ -61,6 +82,50 @@ public class ChatDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat_detail, container, false);
+        binding = FragmentChatDetailBinding.inflate(getLayoutInflater());
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initViewModel();
+
+        initRecyclerAdapter();
+
+        setObserver();
+
+        HashMap<String, Object> mapData = new HashMap<>();
+        mapData.put("endusers", mParam1);
+        mainViewModel.setGroupChatLiveData(mapData);
+    }
+
+    private void initRecyclerAdapter() {
+        binding.userChatRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+
+        userChatDetailAdapter = new UserChatDetailAdapter(requireActivity(), userChat -> {
+
+        });
+
+        binding.userChatRecycler.setAdapter(userChatDetailAdapter);
+    }
+
+    private void initViewModel() {
+        mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+    }
+
+    private void setObserver() {
+        mainViewModel.getChatDetailAdapterLiveData().observe(getViewLifecycleOwner(), new Observer<HashMap<String, ArrayList<UserChat>>>() {
+            @Override
+            public void onChanged(HashMap<String, ArrayList<UserChat>> mapData) {
+                if(mapData.containsKey("chatList")){
+                    Log.d(TAG, "Group Chat is "+ mapData.get("chatList").size());
+                    ArrayList<UserChat> chatList = mapData.get("chatList");
+                    Collections.reverse(chatList);
+                    userChatDetailAdapter.updateChat(chatList);
+                }
+            }
+        });
     }
 }

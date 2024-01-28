@@ -42,13 +42,34 @@ public class MainViewModel extends ViewModel {
         refreshChatHistoryLiveData.setValue(chatHistoryData);
     }
 
-    private final MutableLiveData<HashMap<String, ArrayList<UserChat>>> chatAdapterLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HashMap<String, ArrayList<UserChat>>> chatGroupAdapterLiveData = new MutableLiveData<>();
 
-    public LiveData<HashMap<String, ArrayList<UserChat>>> getChatAdapterLiveData(){
-        return chatAdapterLiveData;
+    public LiveData<HashMap<String, ArrayList<UserChat>>> getChatGroupAdapterLiveData(){
+        return chatGroupAdapterLiveData;
     }
 
-    public void setChatAdapterLiveData(HashMap<String, ArrayList<UserChat>> chatHistoryData){
-        chatAdapterLiveData.setValue(chatHistoryData);
+    public void setChatGroupAdapterLiveData(HashMap<String, ArrayList<UserChat>> chatHistoryData){
+        chatGroupAdapterLiveData.setValue(chatHistoryData);
+    }
+
+
+    private final MutableLiveData<HashMap<String, Object>> initGroupChatLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getGroupChatLiveData(){
+        return initGroupChatLiveData;
+    }
+
+    public void setGroupChatLiveData(HashMap<String, Object> mapData){
+        initGroupChatLiveData.setValue(mapData);
+    }
+
+    private final MutableLiveData<HashMap<String, ArrayList<UserChat>>> chatDetailAdapterLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, ArrayList<UserChat>>> getChatDetailAdapterLiveData(){
+        return chatDetailAdapterLiveData;
+    }
+
+    public void setChatDetailAdapterLiveData(HashMap<String, ArrayList<UserChat>> chatHistoryData){
+        chatDetailAdapterLiveData.setValue(chatHistoryData);
     }
 }
