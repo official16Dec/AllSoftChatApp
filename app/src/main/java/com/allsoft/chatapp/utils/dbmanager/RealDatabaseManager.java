@@ -18,7 +18,9 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 
 public class RealDatabaseManager {
@@ -67,9 +69,23 @@ public class RealDatabaseManager {
         });
     }
 
-    public void registerUser(EndUser endUser){
+    public void registerUser(EndUser endUser, String userKey){
 
-        databaseReference.setValue(endUser);
+        if(endUser.getUser_id() == 1){
+            Map<String, Object> mapData = new HashMap<>();
+            Map<String, Object> userData = new HashMap<>();
+            userData.put(userKey, endUser);
+            mapData.put("endusers", userData);
+            databaseReference.updateChildren(mapData);
+        }
+        else{
+            DatabaseReference userRef = databaseReference.child("endusers");
+
+            Map<String, Object> userData = new HashMap<>();
+            userData.put(userKey, endUser);
+
+            userRef.updateChildren(userData);
+        }
     }
 
     public EndUser getEndUserById(int userId){
@@ -82,7 +98,7 @@ public class RealDatabaseManager {
                 Gson gson = new Gson();
                 endUser = gson.fromJson(jsonObject.toString(), EndUser.class);
 
-                Log.d(TAG, "Value is " + endUser.getUserId());
+                Log.d(TAG, "Value is " + endUser.getUser_id());
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -102,7 +118,7 @@ public class RealDatabaseManager {
                     JSONObject endUserObj = jsonObject.getJSONObject(key);
                     Gson gson = new Gson();
                     EndUser endUser = gson.fromJson(endUserObj.toString(), EndUser.class);
-                    if(Objects.equals(endUser.getUserMobile(), mobileNo) && Objects.equals(endUser.getUserPassword(), pass)){
+                    if(Objects.equals(endUser.getUser_mobile(), mobileNo) && Objects.equals(endUser.getUser_password(), pass)){
                         setUserPreference(endUser);
                         return true;
                     }
@@ -118,10 +134,10 @@ public class RealDatabaseManager {
     }
 
     private void setUserPreference(EndUser endUser) {
-        mySharedPref.setPrefUserId(MySharedPref.prefUserId, endUser.getUserId());
-        mySharedPref.setPrefUserName(MySharedPref.prefUserName, endUser.getUserName());
-        mySharedPref.setPrefUserMobile(MySharedPref.prefUserMobile, endUser.getUserMobile());
-        mySharedPref.setPrefUserMobile(MySharedPref.prefUserMail, endUser.getUserMail());
+        mySharedPref.setPrefUserId(MySharedPref.prefUserId, endUser.getUser_id());
+        mySharedPref.setPrefUserName(MySharedPref.prefUserName, endUser.getUser_name());
+        mySharedPref.setPrefUserMobile(MySharedPref.prefUserMobile, endUser.getUser_mobile());
+        mySharedPref.setPrefUserMobile(MySharedPref.prefUserMail, endUser.getUser_mail());
     }
 
     public JSONObject getAllData(){
@@ -142,6 +158,7 @@ public class RealDatabaseManager {
         return userData;
 
     }
+
 
     public interface DatabaseCallback{
         void databaseLoadingCallback(JSONObject result);

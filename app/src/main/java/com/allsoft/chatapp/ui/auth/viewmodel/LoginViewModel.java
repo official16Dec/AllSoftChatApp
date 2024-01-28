@@ -51,4 +51,14 @@ public class LoginViewModel extends ViewModel {
     public void setManager(RealDatabaseManager realDatabaseManager){
         realDatabaseManagerLiveData.setValue(realDatabaseManager);
     }
+
+    private final MutableLiveData<HashMap<String, Object>> signUpUserLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getSignUpUserLiveData(){
+        return signUpUserLiveData;
+    }
+
+    public void setSignUpUserLiveData(HashMap<String, Object>  mapData){
+        signUpUserLiveData.setValue(mapData);
+    }
 }

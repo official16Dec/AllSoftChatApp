@@ -20,39 +20,39 @@ public class EndUser {
 //        this.user_mail = user_mail;
 //    }
 
-    public int getUserId(){
+    public int getUser_id(){
         return user_id;
     }
 
-    public String getUserName(){
+    public String getUser_name(){
         return user_name;
     }
 
-    public String getUserMobile(){
+    public String getUser_mobile(){
         return user_mobile;
     }
 
-    public String getUserMail(){
+    public String getUser_mail(){
         return user_mail;
     }
-    public String getUserPassword(){
+    public String getUser_password(){
         return user_password;
     }
 
-    public void setUserId(int user_id){
+    public void setUser_id(int user_id){
         this.user_id = user_id;
     }
-    public void setUserName(String user_name){
+    public void setUser_name(String user_name){
         this.user_name = user_name;
     }
-    public void setUserMail(String user_mail){
+    public void setUser_mail(String user_mail){
         this.user_mail = user_mail;
     }
 
-    public void setUserMobile(String user_mobile){
+    public void setUser_mobile(String user_mobile){
         this.user_mobile = user_mobile;
     }
-    public void setUserPassword(String user_password){
+    public void setUser_password(String user_password){
         this.user_password = user_password;
     }
 }

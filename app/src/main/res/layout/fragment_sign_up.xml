@@ -38,8 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/userNameEdit"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:inputType="text"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+            android:inputType="textCapWords"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,6 +60,7 @@
             android:id="@+id/userMobileEdit"
             android:digits="0123456789"
             android:inputType="phone"
+            android:maxLength="10"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -71,7 +72,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userMobileInputLayout"
         android:layout_margin="20dp"
-        android:hint="Mobile No"
+        android:hint="Mail Id"
         style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense"
         >
         <androidx.appcompat.widget.AppCompatEditText
@@ -99,7 +100,6 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:id="@+id/userPassEdit"
-            android:maxLength="10"
             />
     </com.google.android.material.textfield.TextInputLayout>
 

@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.ActivityLoginBinding;
+import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.ui.auth.fragments.LoginFragment;
 import com.allsoft.chatapp.ui.auth.fragments.SignUpFragment;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
@@ -22,6 +23,7 @@ import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class LoginView extends AppCompatActivity {
 
@@ -30,6 +32,8 @@ public class LoginView extends AppCompatActivity {
     private ActivityLoginBinding binding;
 
     RealDatabaseManager realDatabaseManager;
+
+    JSONObject jsonResult;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,12 +44,7 @@ public class LoginView extends AppCompatActivity {
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        realDatabaseManager = new RealDatabaseManager(this, new RealDatabaseManager.DatabaseCallback() {
-            @Override
-            public void databaseLoadingCallback(JSONObject result) {
-
-            }
-        });
+        initRealDatabaseManager();
 
         setObserver();
 
@@ -54,6 +53,15 @@ public class LoginView extends AppCompatActivity {
 
         loginViewModel.setManager(realDatabaseManager);
 
+    }
+
+    private void initRealDatabaseManager() {
+        realDatabaseManager = new RealDatabaseManager(this, new RealDatabaseManager.DatabaseCallback() {
+            @Override
+            public void databaseLoadingCallback(JSONObject result) {
+                jsonResult = result;
+            }
+        });
     }
 
 
@@ -69,6 +77,45 @@ public class LoginView extends AppCompatActivity {
         });
 
         loginViewModel.getMainView().observe(this, stringObjectHashMap -> startMain());
+
+        loginViewModel.getSignUpUserLiveData().observe(this, mapData -> {
+            if(mapData.containsKey("enduser")){
+                EndUser user = (EndUser)mapData.get("enduser");
+                initRealDatabaseManager();
+
+                try{
+
+                    if(jsonResult.has("endusers")) {
+                        JSONObject userData = jsonResult.getJSONObject("endusers");
+                        Iterator<String> keys = userData.keys();
+
+                        int userID = 0;
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            JSONObject userJsonObj = userData.getJSONObject(key);
+                            userID = userJsonObj.getInt("user_id");
+                        }
+                        userID = userID + 1;
+                        user.setUser_id(userID);
+
+                        realDatabaseManager.registerUser(user, "user" + userID);
+
+                        loginViewModel.setLoginLiveData(new HashMap<>());
+                    }
+                    else{
+                        user.setUser_id(1);
+
+                        realDatabaseManager.registerUser(user, "user" + 1);
+
+                        loginViewModel.setLoginLiveData(new HashMap<>());
+                    }
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void startMain() {

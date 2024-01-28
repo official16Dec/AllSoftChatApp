@@ -1,7 +1,9 @@
 package com.allsoft.chatapp.ui.dashboard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.ActivityMainBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
+import com.allsoft.chatapp.ui.auth.LoginView;
 import com.allsoft.chatapp.ui.dashboard.chatDetail.ChatDetailFragment;
 import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
@@ -54,8 +57,22 @@ public class MainView extends AppCompatActivity {
 
         mainViewModel.setChatGroupLiveData(new HashMap<>());
 
+        setListener();
+
     }
 
+    private void setListener() {
+        binding.backBtn.setOnClickListener(view -> onBackPressed());
+
+        binding.logoutBtn.setOnClickListener(view -> {
+
+            mySharedPref.clearData();
+
+            startActivity(new Intent(this, LoginView.class));
+            finish();
+
+        });
+    }
 
 
     private void refreshGroups() {
@@ -172,5 +189,13 @@ public class MainView extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragmentContainer, fragment);
         fragmentTransaction.addToBackStack(fragmentKey);
         fragmentTransaction.commit(); // save the changes
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(getSupportFragmentManager().getBackStackEntryCount() == 1){
+            finish();
+        }
     }
 }
