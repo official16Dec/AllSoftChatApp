@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,10 @@ import android.view.ViewGroup;
 
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentSignUpBinding;
+import com.allsoft.chatapp.model.user.EndUser;
+import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
+
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +35,8 @@ public class SignUpFragment extends Fragment {
     private String mParam2;
 
     private FragmentSignUpBinding binding;
+
+    private LoginViewModel loginViewModel;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -74,8 +81,68 @@ public class SignUpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.signUpBtn.setOnClickListener(view1 -> {
+        initViewModel();
 
+        setListener();
+    }
+
+    private void initViewModel() {
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+    }
+
+    private void setListener(){
+        binding.signUpBtn.setOnClickListener(view1 -> {
+            if(validateSignup()){
+                EndUser user = new EndUser();
+                user.setUser_name(binding.userNameEdit.getText().toString());
+                user.setUser_mobile(binding.userMobileEdit.getText().toString());
+                user.setUser_mail(binding.userMailEdit.getText().toString());
+                user.setUser_password(binding.userPassEdit.getText().toString());
+
+                HashMap<String, Object> mapData = new HashMap<>();
+                mapData.put("enduser", user);
+                loginViewModel.setSignUpUserLiveData(mapData);
+            }
         });
+    }
+
+    private boolean validateSignup(){
+        boolean valid = false;
+        if(binding.userNameEdit.getText().toString().isEmpty()){
+            binding.userNameEdit.setError("Enter your name");
+        }
+        else{
+            binding.userNameEdit.setError(null);
+            valid = true;
+        }
+
+        if(binding.userMobileEdit.getText().toString().isEmpty()){
+            binding.userMobileEdit.setError("Enter your mobile no");
+        }
+        else if(binding.userMobileEdit.getText().toString().length() != 10){
+            binding.userMobileEdit.setError("Enter valid mobile no");
+        }
+        else{
+            binding.userMobileEdit.setError(null);
+            valid = true;
+        }
+
+        if(binding.userMailEdit.getText().toString().isEmpty()){
+            binding.userMailEdit.setError("Enter your mail id");
+        }
+        else{
+            binding.userMailEdit.setError(null);
+            valid = true;
+        }
+
+        if(binding.userPassEdit.getText().toString().isEmpty()){
+            binding.userPassEdit.setError("Enter password");
+        }
+        else{
+            binding.userPassEdit.setError(null);
+            valid = true;
+        }
+
+        return valid;
     }
 }
