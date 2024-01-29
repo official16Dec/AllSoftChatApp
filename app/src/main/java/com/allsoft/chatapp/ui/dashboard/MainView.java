@@ -193,9 +193,15 @@ public class MainView extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         if(getSupportFragmentManager().getBackStackEntryCount() == 1){
             finish();
         }
+        super.onBackPressed();
+    }
+
+    public Fragment getPreviousFragment(){
+        FragmentManager.BackStackEntry backStackEntry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(backStackEntry.getId());
+        return fragment;
     }
 }

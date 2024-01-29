@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.allsoft.chatapp.databinding.FragmentChatDetailBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
+import com.allsoft.chatapp.ui.dashboard.MainView;
 import com.allsoft.chatapp.ui.dashboard.chatDetail.adapter.UserChatDetailAdapter;
+import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
@@ -76,6 +79,20 @@ public class ChatDetailFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(isEnabled()){
+                    setEnabled(false);
+                }
+
+                if(requireActivity().getSupportFragmentManager().findFragmentByTag(ChatGroupFragment.class.getSimpleName())
+                        == ((MainView)requireActivity()).getPreviousFragment()){
+                    requireActivity().getSupportFragmentManager().popBackStack(ChatGroupFragment.class.getSimpleName(), 0);
+                }
+            }
+        });
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.allsoft.chatapp.ui.dashboard.chatGroup;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import com.allsoft.chatapp.databinding.FragmentChatGroupBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
@@ -77,6 +80,16 @@ public class ChatGroupFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(isEnabled()){
+                    setEnabled(false);
+                }
+
+            }
+        });
     }
 
     @Override
