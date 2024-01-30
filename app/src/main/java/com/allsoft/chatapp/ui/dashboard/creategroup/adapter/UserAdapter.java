@@ -2,6 +2,7 @@ package com.allsoft.chatapp.ui.dashboard.creategroup.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -58,6 +59,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private TextView userInfo;
 
         private CheckBox selectUserCheck;
+        private View itmView;
         public UserViewHolder(@NonNull ItemCreateGroupBinding itemView) {
             super(itemView.getRoot());
 
@@ -65,15 +67,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             userName = itemView.userName;
             userInfo = itemView.userInfo;
             selectUserCheck = itemView.selectUserCheck;
+            itmView = itemView.itmView;
 
             bindView();
         }
 
         public void bindView(){
-            itemView.setOnClickListener(view -> {
+            itmView.setOnClickListener(view -> {
                 userSelectCallback.setItemClicked(userList.get(getAdapterPosition()));
                 selectUserCheck.setChecked(!selectUserCheck.isChecked());
             });
+
         }
     }
 

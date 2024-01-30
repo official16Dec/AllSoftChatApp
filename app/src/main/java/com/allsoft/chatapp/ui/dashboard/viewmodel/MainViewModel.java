@@ -22,6 +22,16 @@ public class MainViewModel extends ViewModel {
         chatGroupLiveData.setValue(chatGroupData);
     }
 
+    private final MutableLiveData<Boolean> updateMainUILiveData = new MutableLiveData<>();
+
+    public LiveData<Boolean> getUIMainLiveData(){
+        return updateMainUILiveData;
+    }
+
+    public void setUIMainLiveData(boolean uiMainFlag){
+        updateMainUILiveData.setValue(uiMainFlag);
+    }
+
 
     private final MutableLiveData<HashMap<String, Object>> chatDetailLiveData = new MutableLiveData<>();
 

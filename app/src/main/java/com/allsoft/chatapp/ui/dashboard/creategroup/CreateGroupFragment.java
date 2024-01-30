@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +20,8 @@ import com.allsoft.chatapp.databinding.FragmentCreateGroupBinding;
 import com.allsoft.chatapp.model.chats.ChatData;
 import com.allsoft.chatapp.model.chats.UserChat;
 import com.allsoft.chatapp.model.user.EndUser;
+import com.allsoft.chatapp.ui.dashboard.chatDetail.ChatDetailFragment;
+import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.creategroup.adapter.UserAdapter;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
@@ -25,6 +29,7 @@ import com.allsoft.chatapp.utils.preference.MySharedPref;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,7 +56,6 @@ public class CreateGroupFragment extends Fragment {
     private UserAdapter userAdapter;
 
     private ArrayList<EndUser> userListToHandle;
-    private ArrayList<UserChat> userChatList;
 
     private MySharedPref mySharedPref;
 
@@ -85,6 +89,19 @@ public class CreateGroupFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(isEnabled()){
+                    setEnabled(false);
+                }
+
+                requireActivity().getSupportFragmentManager()
+                        .popBackStack(CreateGroupFragment.class.getSimpleName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                mainViewModel.setUIMainLiveData(true);
+            }
+        });
     }
 
     @Override
@@ -106,12 +123,9 @@ public class CreateGroupFragment extends Fragment {
 
         initViewModel();
 
-        initUserAdapter();
-
         setObserver();
 
         setListeners();
-
 
 
         EndUser endUser = new EndUser();
@@ -124,15 +138,12 @@ public class CreateGroupFragment extends Fragment {
 
         userListToHandle.add(endUser);
 
+        mainViewModel.setUIMainLiveData(false);
+
     }
 
     private void setListeners(){
-        binding.createGroupBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createUserChatToSetDatabase();
-            }
-        });
+        binding.createGroupBtn.setOnClickListener(view -> createUserChatToSetDatabase());
     }
     private void initViewModel(){
         mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
@@ -141,7 +152,7 @@ public class CreateGroupFragment extends Fragment {
     private void setObserver(){
         mainViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userListMap -> {
             if(userListMap.containsKey("userList")){
-                Log.d(TAG, "Size is : "+userListMap.get("userList").size());
+                initUserAdapter();
                 userAdapter.updateUserList(userListMap.get("userList"));
             }
         });
@@ -151,6 +162,8 @@ public class CreateGroupFragment extends Fragment {
         binding.userRecycler.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false));
 
         userAdapter = new UserAdapter(requireActivity(), endUser -> {
+            mainViewModel.setRefreshChatHistoryLiveData(new HashMap<>());
+
             if(userListToHandle.contains(endUser)){
                 userListToHandle.remove(endUser);
                 Toast.makeText(requireActivity(), endUser.getUser_id()+" Removed", Toast.LENGTH_SHORT).show();
@@ -158,25 +171,22 @@ public class CreateGroupFragment extends Fragment {
                 userListToHandle.add(endUser);
                 Toast.makeText(requireActivity(), endUser.getUser_id()+" Added", Toast.LENGTH_SHORT).show();
             }
-            Collections.sort(userListToHandle);
+
+            if(userListToHandle.size()>1){
+                binding.createGroupBtn.setVisibility(View.VISIBLE);
+            }
+            else{
+                binding.createGroupBtn.setVisibility(View.GONE);
+            }
 
         });
         binding.userRecycler.setAdapter(userAdapter);
     }
 
     private void createUserChatToSetDatabase(){
-        String endUsers = "";
-
-        for(EndUser endUser : userListToHandle){
-            if(endUsers.isEmpty()){
-                endUsers = String.valueOf(endUser.getUser_id());
-            }
-            else{
-                endUsers = endUsers+"V"+endUser.getUser_id();
-            }
-        }
-
-        userChatList = new ArrayList<>();
+        String endusers = getEndusers();
+        Log.d("endusers", endusers);
+        ArrayList<UserChat> userChatList = new ArrayList<>();
 
         for (EndUser endUser : userListToHandle){
             UserChat userChat = new UserChat();
@@ -186,6 +196,7 @@ public class CreateGroupFragment extends Fragment {
             chatData.setChat_image("");
             chatData.setChat_message("");
             chatData.setChat_video("");
+            userChat.setChat(chatData);
 
             String chatTitle = "";
             for (EndUser user : userListToHandle){
@@ -198,10 +209,10 @@ public class CreateGroupFragment extends Fragment {
                     }
                 }
             }
-            userChat.setEndusers(endUsers);
-            userChat.setChatTitle(chatTitle);
+            userChat.setEndusers(endusers);
+            userChat.setChat_title(chatTitle);
             userChat.setSender(endUser.getUser_id());
-            userChat.setChatDesc("");
+            userChat.setChat_desc("");
             userChat.setWhen("");
 
             userChatList.add(userChat);
@@ -211,5 +222,22 @@ public class CreateGroupFragment extends Fragment {
         userGroupMap.put("usergroup", userChatList);
         mainViewModel.setUserGroupLiveData(userGroupMap);
 
+    }
+
+    private String getEndusers(){
+        Collections.sort(userListToHandle);
+
+        StringBuilder endUsers = new StringBuilder();
+
+        for(EndUser endUser : userListToHandle){
+            if(endUsers.toString().equals("")){
+                endUsers = new StringBuilder(String.valueOf(endUser.getUser_id()));
+            }
+            else{
+                endUsers.append("V").append(endUser.getUser_id());
+            }
+        }
+
+        return endUsers.toString();
     }
 }

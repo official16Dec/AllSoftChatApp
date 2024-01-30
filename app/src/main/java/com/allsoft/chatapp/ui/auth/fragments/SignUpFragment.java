@@ -98,6 +98,7 @@ public class SignUpFragment extends Fragment {
                 user.setUser_mobile(binding.userMobileEdit.getText().toString());
                 user.setUser_mail(binding.userMailEdit.getText().toString());
                 user.setUser_password(binding.userPassEdit.getText().toString());
+                user.setUser_profile_pic("");
 
                 HashMap<String, Object> mapData = new HashMap<>();
                 mapData.put("enduser", user);

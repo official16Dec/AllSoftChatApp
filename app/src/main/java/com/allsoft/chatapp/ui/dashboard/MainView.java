@@ -81,7 +81,19 @@ public class MainView extends AppCompatActivity {
 
 
     private void refreshGroups() {
-        realDatabaseManager = new RealDatabaseManager(this, result -> manageChatHistory(result));
+        realDatabaseManager = new RealDatabaseManager(this, new RealDatabaseManager.DatabaseCallback() {
+            @Override
+            public void databaseLoadingCallback(JSONObject result) {
+                manageChatHistory(result);
+            }
+
+            @Override
+            public void groupDetailCallBack(String endusers) {
+                HashMap<String, Object> mapData = new HashMap<>();
+                mapData.put("endusers", endusers);
+                mainViewModel.setChatDetailLiveData(mapData);
+            }
+        });
 
     }
 
@@ -101,10 +113,10 @@ public class MainView extends AppCompatActivity {
                     JSONObject conversationData = groupData.getJSONObject(conversationKey);
 
                     if(conversationData.getInt("sender") == mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
-
                         Gson gson = new Gson();
                         UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
                         userChatList.add(userChat);
+                        break;
                     }
                 }
             }
@@ -121,6 +133,16 @@ public class MainView extends AppCompatActivity {
     }
 
     private void setObserver() {
+        mainViewModel.getUIMainLiveData().observe(this, uiMainFlag -> {
+            if(uiMainFlag){
+                binding.mainBarTitle.setText("Chat History");
+                binding.composeNewBtn.setVisibility(View.VISIBLE);
+            }
+            else{
+                binding.composeNewBtn.setVisibility(View.GONE);
+            }
+        });
+
         mainViewModel.getChatGroupLiveData().observe(this, stringObjectHashMap -> {
             ChatGroupFragment chatGroupFragment = ChatGroupFragment.newInstance("", "");
             loadFragment(chatGroupFragment, ChatGroupFragment.class.getSimpleName());
@@ -128,13 +150,11 @@ public class MainView extends AppCompatActivity {
 
         mainViewModel.getChatDetailLiveData().observe(this, mapData -> {
             if(mapData.containsKey("endusers")){
-                getChatGroupTitle(String.valueOf(mapData.get("endusers")));
 
-                new Handler().postDelayed(() -> {
-                    ChatDetailFragment chatDetailFragment = ChatDetailFragment.newInstance(String.valueOf(mapData.get("endusers")),
-                            binding.mainBarTitle.getText().toString());
-                    loadFragment(chatDetailFragment, ChatDetailFragment.class.getSimpleName());
-                }, 600);
+                getChatGroupTitle(String.valueOf(mapData.get("endusers")));
+                ChatDetailFragment chatDetailFragment = ChatDetailFragment.newInstance(String.valueOf(mapData.get("endusers")),
+                        binding.mainBarTitle.getText().toString());
+                loadFragment(chatDetailFragment, ChatDetailFragment.class.getSimpleName());
 
             }
 
@@ -144,7 +164,14 @@ public class MainView extends AppCompatActivity {
 
         mainViewModel.getGroupChatLiveData().observe(this, mapData -> {
             if(mapData.containsKey("endusers")){
-                getGroupConversation(String.valueOf(mapData.get("endusers")));
+                refreshGroups();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getGroupConversation(String.valueOf(mapData.get("endusers")));
+                    }
+                }, 1500);
+
             }
         });
 
@@ -214,9 +241,13 @@ public class MainView extends AppCompatActivity {
                     JSONObject conversationData = groupData.getJSONObject(groupKey);
 
                     if(conversationData.getString("endusers").equals(endusers)){
-                        Gson gson = new Gson();
-                        UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
-                        userChatList.add(userChat);
+                        if(conversationData.has("chat")){
+                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
+                                Gson gson = new Gson();
+                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
+                                userChatList.add(userChat);
+                            }
+                        }
                     }
                 }
             }

@@ -43,8 +43,8 @@ public class UserChatGroupAdapter extends RecyclerView.Adapter<UserChatGroupAdap
     @Override
     public void onBindViewHolder(@NonNull UserChatViewHolder holder, int position) {
         holder.chatImage.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.ic_launcher));
-        holder.chatTitle.setText(groupChatList.get(position).getChatTitle());
-        holder.chatDescription.setText(groupChatList.get(position).getChatDesc());
+        holder.chatTitle.setText(groupChatList.get(position).getChat_title());
+        holder.chatDescription.setText(groupChatList.get(position).getChat_desc());
     }
 
     @Override

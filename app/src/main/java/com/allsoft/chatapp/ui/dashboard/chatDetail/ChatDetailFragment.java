@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,16 +23,15 @@ import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentChatDetailBinding;
 import com.allsoft.chatapp.model.chats.ChatData;
 import com.allsoft.chatapp.model.chats.UserChat;
-import com.allsoft.chatapp.ui.dashboard.MainView;
 import com.allsoft.chatapp.ui.dashboard.chatDetail.adapter.UserChatDetailAdapter;
 import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
+import com.allsoft.chatapp.ui.dashboard.creategroup.CreateGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -97,8 +97,12 @@ public class ChatDetailFragment extends Fragment {
                     setEnabled(false);
                 }
 
-                if(requireActivity().getSupportFragmentManager().findFragmentByTag(ChatGroupFragment.class.getSimpleName()) != null){
-                    requireActivity().getSupportFragmentManager().popBackStack(ChatGroupFragment.class.getSimpleName(), 0);
+                requireActivity().getSupportFragmentManager()
+                        .popBackStack(ChatDetailFragment.class.getSimpleName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                if(requireActivity().getSupportFragmentManager().findFragmentByTag(CreateGroupFragment.class.getSimpleName())
+                        == null){
+                    mainViewModel.setUIMainLiveData(true);
                 }
             }
         });
@@ -120,13 +124,14 @@ public class ChatDetailFragment extends Fragment {
 
         initViewModel();
 
-        initRecyclerAdapter();
-
         setObserver();
 
         refreshGroupChat();
 
         setListeners();
+
+        mainViewModel.setUIMainLiveData(false);
+
     }
 
     private void refreshGroupChat(){
@@ -174,7 +179,7 @@ public class ChatDetailFragment extends Fragment {
                 chatData.setChat_video("");
 
                 userChat.setChat(chatData);
-                userChat.setChatTitle(mParam2);
+                userChat.setChat_title(mParam2);
                 userChat.setEndusers(mParam1);
                 userChat.setSender(mySharedPref.getPrefUserId(MySharedPref.prefUserId));
                 userChat.setWhen(String.valueOf(System.currentTimeMillis()));
@@ -212,10 +217,8 @@ public class ChatDetailFragment extends Fragment {
             @Override
             public void onChanged(HashMap<String, ArrayList<UserChat>> mapData) {
                 if(mapData.containsKey("chatList")){
-                    Log.d(TAG, "Group Chat is "+ mapData.get("chatList").size());
-                    ArrayList<UserChat> chatList = mapData.get("chatList");
-                    Collections.reverse(chatList);
-                    userChatDetailAdapter.updateChat(chatList);
+                    initRecyclerAdapter();
+                    userChatDetailAdapter.updateChat(mapData.get("chatList"));
                 }
             }
         });

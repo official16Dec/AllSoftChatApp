@@ -17,19 +17,19 @@ public class UserChat {
         this.endusers = end_users;
     }
 
-    public String getChatTitle(){
+    public String getChat_title(){
         return chat_title;
     }
 
-    public void setChatTitle(String chat_title){
+    public void setChat_title(String chat_title){
         this.chat_title = chat_title;
     }
 
-    public String getChatDesc(){
+    public String getChat_desc(){
         return chat_desc;
     }
 
-    public void setChatDesc(String chat_desc){
+    public void setChat_desc(String chat_desc){
         this.chat_desc = chat_desc;
     }
 

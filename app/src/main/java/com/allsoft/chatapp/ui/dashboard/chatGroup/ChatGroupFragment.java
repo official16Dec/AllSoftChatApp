@@ -81,13 +81,12 @@ public class ChatGroupFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(isEnabled()){
                     setEnabled(false);
                 }
-
             }
         });
     }
@@ -104,8 +103,6 @@ public class ChatGroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initUserChatAdapter();
-
         initViewModel();
 
         setObserver();
@@ -115,16 +112,12 @@ public class ChatGroupFragment extends Fragment {
 
     private void setObserver() {
 
-        mainViewModel.getChatGroupAdapterLiveData().observe(getViewLifecycleOwner(), stringObjectHashMap -> {
+        mainViewModel.getChatGroupAdapterLiveData().observe(getViewLifecycleOwner(), mapData -> {
 
-            if(stringObjectHashMap.containsKey("chatList")){
+            if(mapData.containsKey("chatList")){
                 setProgressVisibility(true);
-                ArrayList<UserChat> chatList = new ArrayList<>();
-                Log.d(TAG, "List is "+stringObjectHashMap.get("chatList"));
-                chatList.addAll(stringObjectHashMap.get("chatList"));
-                if (chatList.size() > 0) {
-                    userChatGroupAdapter.updateChat(chatList);
-                }
+                initUserChatAdapter();
+                userChatGroupAdapter.updateChat(mapData.get("chatList"));
             }
         });
     }
@@ -136,13 +129,10 @@ public class ChatGroupFragment extends Fragment {
     private void initUserChatAdapter() {
         binding.userGroupRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
 
-        userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), new UserChatGroupAdapter.ChatHistoryCallback() {
-            @Override
-            public void setHistoryItemClicked(UserChat userChat) {
-                HashMap mapData = new HashMap<String, Object>();
-                mapData.put("endusers", userChat.getEndusers());
-                mainViewModel.setChatDetailLiveData(mapData);
-            }
+        userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), userChat -> {
+            HashMap<String, Object> mapData = new HashMap<>();
+            mapData.put("endusers", userChat.getEndusers());
+            mainViewModel.setChatDetailLiveData(mapData);
         });
 
         binding.userGroupRecycler.setAdapter(userChatGroupAdapter);
