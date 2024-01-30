@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.allsoft.chatapp.model.chats.UserChat;
+import com.allsoft.chatapp.model.user.EndUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,5 +72,46 @@ public class MainViewModel extends ViewModel {
 
     public void setChatDetailAdapterLiveData(HashMap<String, ArrayList<UserChat>> chatHistoryData){
         chatDetailAdapterLiveData.setValue(chatHistoryData);
+    }
+
+    private final MutableLiveData<HashMap<String, Object>> updateGroupChatLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getUpdateGroupChatLiveData(){
+        return updateGroupChatLiveData;
+    }
+
+    public void setUpdateGroupChatLiveData(HashMap<String, Object> groupChat){
+        updateGroupChatLiveData.setValue(groupChat);
+    }
+
+
+    private final MutableLiveData<HashMap<String, Object>> createGroupLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getCreateGroupLiveData(){
+        return createGroupLiveData;
+    }
+
+    public void setCreateGroupLiveData(HashMap<String, Object> groupChat){
+        createGroupLiveData.setValue(groupChat);
+    }
+
+    private final MutableLiveData<HashMap<String, ArrayList<EndUser>>> userListLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, ArrayList<EndUser>>> getUserListLiveData(){
+        return userListLiveData;
+    }
+
+    public void setUserListLiveData(HashMap<String, ArrayList<EndUser>> groupChat){
+        userListLiveData.setValue(groupChat);
+    }
+
+    private final MutableLiveData<HashMap<String, ArrayList<UserChat>>> userGroupLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, ArrayList<UserChat>>> getUserGroupLiveData(){
+        return userGroupLiveData;
+    }
+
+    public void setUserGroupLiveData(HashMap<String, ArrayList<UserChat>> groupChat){
+        userGroupLiveData.setValue(groupChat);
     }
 }

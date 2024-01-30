@@ -2,10 +2,12 @@ package com.allsoft.chatapp.utils.dbmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.allsoft.chatapp.model.chats.UserChat;
 import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +20,7 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -157,6 +160,93 @@ public class RealDatabaseManager {
         }
         return userData;
 
+    }
+
+    public void updateGroupChat(UserChat userChat, String endUsers){
+        try{
+            try {
+                DatabaseReference userChatRef = databaseReference.child("user_chats");
+                JSONObject userChatObj = getAllData().getJSONObject("user_chats");
+                Iterator<String> groupKeys = userChatObj.keys();
+
+                String lastGroupKey = "";
+                String lastConversationKey = "";
+
+                while(groupKeys.hasNext()){
+                    String groupKey = groupKeys.next();
+                    JSONObject conversationObj = userChatObj.getJSONObject(groupKey);
+                    Iterator<String> conversationKeys = conversationObj.keys();
+
+                    while(conversationKeys.hasNext()){
+                        String conversationKey = conversationKeys.next();
+                        JSONObject chatObj = conversationObj.getJSONObject(conversationKey);
+
+                        if(chatObj.getString("endusers").equals(endUsers)){
+                            lastConversationKey = conversationKey;
+                        }
+                    }
+                    lastGroupKey = groupKey;
+                    if(!lastConversationKey.isEmpty()){
+                        break;
+                    }
+                }
+
+
+                HashMap<String, Object> groupData = new HashMap<>();
+                HashMap<String, Object> conversationData = new HashMap<>();
+                if(lastConversationKey.isEmpty()){
+                    conversationData.put("conversation1", userChat);
+                    int newGroupKey = Integer.parseInt(lastGroupKey.replace("group", ""))+1;
+                    groupData.put("group"+newGroupKey, conversationData);
+
+                }
+                else{
+
+                    int newKey = Integer.parseInt(lastConversationKey.replaceAll("conversation", ""))+1;
+                    conversationData.put("conversation"+newKey, userChat);
+                    groupData.put(lastGroupKey, conversationData);
+
+                }
+
+                userChatRef.updateChildren(groupData);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void createGroupWithData(ArrayList<UserChat> userChatList){
+        try{
+            DatabaseReference chatAppRef = FirebaseDatabase.getInstance().getReference("chat_app");
+            chatAppRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        for(DataSnapshot childSnapshot : snapshot.getChildren()){
+                            if(childSnapshot.child("endusers").exists()){
+                                Log.d("isExist", "Yess");
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

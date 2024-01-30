@@ -2,4 +2,5 @@
     <string name="app_name">AllSoftChatApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="send_message_to">Send message to</string>
 </resources>

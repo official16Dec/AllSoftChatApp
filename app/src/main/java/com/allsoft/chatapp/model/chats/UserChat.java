@@ -9,11 +9,11 @@ public class UserChat {
 
     private ChatData chat;
 
-    public String getEndUsers(){
+    public String getEndusers(){
         return endusers;
     }
 
-    public void setEndUsers(String end_users){
+    public void setEndusers(String end_users){
         this.endusers = end_users;
     }
 

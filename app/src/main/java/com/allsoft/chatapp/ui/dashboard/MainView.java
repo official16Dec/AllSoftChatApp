@@ -2,6 +2,7 @@ package com.allsoft.chatapp.ui.dashboard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -16,9 +17,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.ActivityMainBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
+import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.ui.auth.LoginView;
 import com.allsoft.chatapp.ui.dashboard.chatDetail.ChatDetailFragment;
 import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
+import com.allsoft.chatapp.ui.dashboard.creategroup.CreateGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
@@ -72,6 +75,8 @@ public class MainView extends AppCompatActivity {
             finish();
 
         });
+
+        binding.composeNewBtn.setOnClickListener(view -> mainViewModel.setCreateGroupLiveData(new HashMap<>()));
     }
 
 
@@ -85,17 +90,18 @@ public class MainView extends AppCompatActivity {
             JSONObject chatData = result.getJSONObject("user_chats");
             ArrayList<UserChat> userChatList = new ArrayList<>();
 
-            Iterator<String> keys = chatData.keys();
-            while(keys.hasNext()){
-                String key = keys.next();
-                JSONObject groupData = chatData.getJSONObject(key);
+            Iterator<String> groupKeys = chatData.keys();
+            while(groupKeys.hasNext()){
+                String groupKey = groupKeys.next();
+                JSONObject groupData = chatData.getJSONObject(groupKey);
 
-                Iterator<String> groupKeys = groupData.keys();
-                while(groupKeys.hasNext()){
-                    String groupKey = groupKeys.next();
-                    JSONObject conversationData = groupData.getJSONObject(groupKey);
+                Iterator<String> conversationKeys = groupData.keys();
+                while(conversationKeys.hasNext()){
+                    String conversationKey = conversationKeys.next();
+                    JSONObject conversationData = groupData.getJSONObject(conversationKey);
 
                     if(conversationData.getInt("sender") == mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
+
                         Gson gson = new Gson();
                         UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
                         userChatList.add(userChat);
@@ -122,20 +128,68 @@ public class MainView extends AppCompatActivity {
 
         mainViewModel.getChatDetailLiveData().observe(this, mapData -> {
             if(mapData.containsKey("endusers")){
-                ChatDetailFragment chatDetailFragment = ChatDetailFragment.newInstance(String.valueOf(mapData.get("endusers")), "");
-                loadFragment(chatDetailFragment, ChatDetailFragment.class.getSimpleName());
+                getChatGroupTitle(String.valueOf(mapData.get("endusers")));
+
+                new Handler().postDelayed(() -> {
+                    ChatDetailFragment chatDetailFragment = ChatDetailFragment.newInstance(String.valueOf(mapData.get("endusers")),
+                            binding.mainBarTitle.getText().toString());
+                    loadFragment(chatDetailFragment, ChatDetailFragment.class.getSimpleName());
+                }, 600);
+
             }
 
         });
 
         mainViewModel.getRefreshChatHistoryLiveData().observe(this, stringObjectHashMap -> refreshGroups());
 
-        mainViewModel.getGroupChatLiveData().observe(this, new Observer<HashMap<String, Object>>() {
-            @Override
-            public void onChanged(HashMap<String, Object> mapData) {
-                if(mapData.containsKey("endusers")){
-                    getGroupConversation(String.valueOf(mapData.get("endusers")));
+        mainViewModel.getGroupChatLiveData().observe(this, mapData -> {
+            if(mapData.containsKey("endusers")){
+                getGroupConversation(String.valueOf(mapData.get("endusers")));
+            }
+        });
+
+        mainViewModel.getUpdateGroupChatLiveData().observe(this, mapData -> {
+            if(mapData.containsKey("user_chat")){
+                updateGroupChat((UserChat) mapData.get("user_chat"), String.valueOf(mapData.get("endusers")));
+            }
+        });
+
+
+        mainViewModel.getCreateGroupLiveData().observe(this, mapData->{
+            binding.mainBarTitle.setText(getString(R.string.send_message_to));
+            binding.composeNewBtn.setVisibility(View.GONE);
+
+            CreateGroupFragment createGroupFragment = CreateGroupFragment.newInstance("", "");
+            loadFragment(createGroupFragment, CreateGroupFragment.class.getSimpleName());
+
+            HashMap<String, ArrayList<EndUser>> userListMap = new HashMap<>();
+
+            try{
+                JSONObject userData = realDatabaseManager.getAllUserData();
+                Iterator<String> userKeys = userData.keys();
+
+                ArrayList<EndUser> userList = new ArrayList<>();
+                while(userKeys.hasNext()){
+                    String userKey = userKeys.next();
+                    JSONObject userObj = userData.getJSONObject(userKey);
+
+                    Gson gson = new Gson();
+                    EndUser endUser = gson.fromJson(userObj.toString(), EndUser.class);
+                    if(endUser.getUser_id() != mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
+                        userList.add(endUser);
+                    }
                 }
+                userListMap.put("userList", userList);
+                new Handler().postDelayed(() -> mainViewModel.setUserListLiveData(userListMap), 600);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        mainViewModel.getUserGroupLiveData().observe(this, groupMap -> {
+            if(groupMap.containsKey("usergroup")){
+                realDatabaseManager.createGroupWithData(groupMap.get("usergroup"));
             }
         });
 
@@ -199,9 +253,33 @@ public class MainView extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    public Fragment getPreviousFragment(){
-        FragmentManager.BackStackEntry backStackEntry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1);
-        Fragment fragment = getSupportFragmentManager().findFragmentById(backStackEntry.getId());
-        return fragment;
+
+    private void getChatGroupTitle(String endusers){
+        String[] users = endusers.split("V");
+
+        String chatTitle = "";
+
+        try{
+            for(String user : users) {
+                EndUser endUser = realDatabaseManager.getEndUserById(Integer.parseInt(user));
+                if (endUser.getUser_id() != mySharedPref.getPrefUserId(MySharedPref.prefUserId)) {
+                    if(chatTitle.isEmpty()){
+                        chatTitle = "to "+endUser.getUser_name();
+                    }
+                    else{
+                        chatTitle = chatTitle+", "+endUser.getUser_name();
+                    }
+                }
+            }
+            binding.mainBarTitle.setText(chatTitle);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void updateGroupChat(UserChat userChat, String endusers){
+        realDatabaseManager.updateGroupChat(userChat, endusers);
     }
 }

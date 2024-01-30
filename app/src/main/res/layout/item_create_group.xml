@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:background="@color/light_green"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/userProfilePic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="W, 1:1"
+        app:layout_constraintWidth_percent="0.18"
+        android:layout_margin="10dp"
+        android:src="@mipmap/ic_launcher"
+        android:padding="10dp"
+        />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/userName"
+        android:text="User 1"
+        app:layout_constraintStart_toEndOf="@id/userProfilePic"
+        app:layout_constraintTop_toTopOf="@id/userProfilePic"
+        app:layout_constraintEnd_toStartOf="@id/selectUserCheck"
+        android:layout_marginHorizontal="6dp"
+        android:layout_marginTop="10dp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+
+        />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/userInfo"
+        android:text="User info"
+        app:layout_constraintStart_toEndOf="@id/userProfilePic"
+        app:layout_constraintTop_toBottomOf="@id/userName"
+        app:layout_constraintEnd_toStartOf="@id/selectUserCheck"
+        android:layout_marginHorizontal="6dp"
+        android:layout_marginTop="10dp"
+        android:textSize="12sp"
+        android:minLines="2"
+        android:maxLines="2"
+        android:ellipsize="end"
+        />
+
+    <CheckBox
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/selectUserCheck"
+        app:layout_constraintDimensionRatio="W, 1:1"
+        app:layout_constraintWidth_percent="0.14"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -134,27 +134,27 @@ public class ChatGroupFragment extends Fragment {
     }
 
     private void initUserChatAdapter() {
-        binding.userChatRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+        binding.userGroupRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
 
         userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), new UserChatGroupAdapter.ChatHistoryCallback() {
             @Override
             public void setHistoryItemClicked(UserChat userChat) {
                 HashMap mapData = new HashMap<String, Object>();
-                mapData.put("endusers", userChat.getEndUsers());
+                mapData.put("endusers", userChat.getEndusers());
                 mainViewModel.setChatDetailLiveData(mapData);
             }
         });
 
-        binding.userChatRecycler.setAdapter(userChatGroupAdapter);
+        binding.userGroupRecycler.setAdapter(userChatGroupAdapter);
     }
 
     private void setProgressVisibility(boolean shouldVisible){
         if(shouldVisible){
-            binding.userChatRecycler.setVisibility(View.VISIBLE);
+            binding.userGroupRecycler.setVisibility(View.VISIBLE);
             binding.chatGroupShimmerLayout.getRoot().setVisibility(View.GONE);
         }
         else{
-            binding.userChatRecycler.setVisibility(View.GONE);
+            binding.userGroupRecycler.setVisibility(View.GONE);
             binding.chatGroupShimmerLayout.getRoot().setVisibility(View.VISIBLE);
         }
     }
