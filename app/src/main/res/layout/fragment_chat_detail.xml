@@ -74,6 +74,7 @@
             android:paddingHorizontal="6dp"
             android:layout_marginHorizontal="10dp"
             android:hint="Type your message..."
+            android:textColorHint="@color/grey"
             app:layout_constraintEnd_toStartOf="@id/attachBtn"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

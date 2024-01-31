@@ -2,6 +2,7 @@ package com.allsoft.chatapp.utils.dbmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -22,8 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -73,7 +76,7 @@ public class RealDatabaseManager {
                             userChat.setEndusers("");
                             userChat.setSender(0);
                             conversationMap.put("conversation1", userChat);
-                            groupMap.put("group0", conversationMap);
+                            groupMap.put("0V0", conversationMap);
                             userChatMap.put("user_chats", groupMap);
                             databaseReference.updateChildren(userChatMap);
                         }
@@ -219,8 +222,7 @@ public class RealDatabaseManager {
 
                 HashMap<String, Object> conversationMap = new HashMap<>();
                 DatabaseReference groupRef = userChatRef.child(lastGroupKey);
-                int newKey = Integer.parseInt(lastConversationKey.replaceAll("conversation", "")) + 1;
-                conversationMap.put("conversation" + newKey, userChat);
+                conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
                 groupRef.updateChildren(conversationMap);
 
 
@@ -234,16 +236,20 @@ public class RealDatabaseManager {
         }
     }
 
+
+
     public void createGroupWithData(ArrayList<UserChat> userChatList){
         try{
             JSONObject userChats = allDataObj.getJSONObject("user_chats");
+            Log.d("userChatJson", userChats.toString());
             Iterator<String> groupKeys = userChats.keys();
 
             String lastGroupKey = "";
             String lastConversationKey = "";
+
             while (groupKeys.hasNext()) {
-                lastGroupKey = groupKeys.next();
-                JSONObject groupObj = userChats.getJSONObject(lastGroupKey);
+                String groupKey = groupKeys.next();
+                JSONObject groupObj = userChats.getJSONObject(groupKey);
                 Iterator<String> conversationKeys = groupObj.keys();
                 while(conversationKeys.hasNext()){
                     String conversationKey = conversationKeys.next();
@@ -254,43 +260,42 @@ public class RealDatabaseManager {
                         }
                     }
                 }
+
+                lastGroupKey = groupKey;
+
+                if(!lastConversationKey.equals("")){
+                    break;
+                }
             }
+
+
+
+            Log.d("LastConKey", lastConversationKey);
+            Log.d("groupKeys", lastGroupKey);
 
             if(lastConversationKey.equals("")){
                 HashMap<String, Object> groupMap = new HashMap<>();
-                int newGroupKeyId = Integer.parseInt(lastGroupKey.replace("group", "")) + 1;
-                String newGroupKey = "group" + newGroupKeyId;
-                int conversationKeyId = 1;
+
+                String newGroupKey = userChatList.get(0).getEndusers();
 
                 DatabaseReference chatDataRef = databaseReference.child("user_chats");
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
-                    conversationMap.put("conversation" + conversationKeyId, userChat);
+                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
                     groupMap.put(newGroupKey, conversationMap);
-                    if(conversationKeyId == 1){
-                        chatDataRef.updateChildren(groupMap);
-                    }
-                    else{
-                        DatabaseReference groupPref = chatDataRef.child(newGroupKey);
-                        groupPref.updateChildren(conversationMap);
-                    }
-
-                    conversationKeyId++;
+                    DatabaseReference groupPref = chatDataRef.child(newGroupKey);
+                    groupPref.updateChildren(conversationMap);
                 }
             }
             else{
                 DatabaseReference chatDataRef = databaseReference.child("user_chats");
                 DatabaseReference groupRef = chatDataRef.child(lastGroupKey);
-                int conversationKeyId = 1;
-
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
-                    conversationMap.put("conversation" + conversationKeyId, userChat);
+                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
                     groupRef.updateChildren(conversationMap);
-
-                    conversationKeyId++;
                 }
             }
 
