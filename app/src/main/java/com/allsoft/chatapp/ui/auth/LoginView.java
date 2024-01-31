@@ -76,6 +76,11 @@ public class LoginView extends AppCompatActivity {
             public void groupDetailCallBack(String endusers) {
 
             }
+
+            @Override
+            public void getChatListCallback(JSONObject groupChatObj) {
+
+            }
         });
     }
 

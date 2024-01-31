@@ -93,6 +93,36 @@ public class MainView extends AppCompatActivity {
                 mapData.put("endusers", endusers);
                 mainViewModel.setChatDetailLiveData(mapData);
             }
+
+            @Override
+            public void getChatListCallback(JSONObject groupChatObj) {
+                try {
+                    ArrayList<UserChat> userChatList = new ArrayList<>();
+
+                    Iterator<String> groupKeys = groupChatObj.keys();
+                    while(groupKeys.hasNext()){
+                        String groupKey = groupKeys.next();
+                        JSONObject conversationData = groupChatObj.getJSONObject(groupKey);
+
+                        if(conversationData.has("chat")){
+                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
+                                Gson gson = new Gson();
+                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
+                                userChatList.add(userChat);
+                            }
+                        }
+                    }
+
+                    Log.d(TAG, "Size is "+userChatList.size());
+                    HashMap<String, ArrayList<UserChat>> chatHistoryData = new HashMap<>();
+                    chatHistoryData.put("chatList", userChatList);
+                    mainViewModel.setChatDetailAdapterLiveData(chatHistoryData);
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
         });
 
     }
@@ -224,43 +254,7 @@ public class MainView extends AppCompatActivity {
 
     private void getGroupConversation(String endusers) {
 
-        JSONObject result = realDatabaseManager.getAllData();
-
-        try {
-            JSONObject chatData = result.getJSONObject("user_chats");
-            ArrayList<UserChat> userChatList = new ArrayList<>();
-
-            Iterator<String> keys = chatData.keys();
-            while(keys.hasNext()){
-                String key = keys.next();
-                JSONObject groupData = chatData.getJSONObject(key);
-
-                Iterator<String> groupKeys = groupData.keys();
-                while(groupKeys.hasNext()){
-                    String groupKey = groupKeys.next();
-                    JSONObject conversationData = groupData.getJSONObject(groupKey);
-
-                    if(conversationData.getString("endusers").equals(endusers)){
-                        if(conversationData.has("chat")){
-                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
-                                Gson gson = new Gson();
-                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
-                                userChatList.add(userChat);
-                            }
-                        }
-                    }
-                }
-            }
-
-            Log.d(TAG, "Size is "+userChatList.size());
-            HashMap<String, ArrayList<UserChat>> chatHistoryData = new HashMap<>();
-            chatHistoryData.put("chatList", userChatList);
-            mainViewModel.setChatDetailAdapterLiveData(chatHistoryData);
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        realDatabaseManager.getAllGroupData(endusers);
 
     }
 

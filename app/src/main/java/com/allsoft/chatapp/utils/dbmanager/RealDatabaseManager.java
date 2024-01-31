@@ -179,6 +179,32 @@ public class RealDatabaseManager {
         return allDataObj;
     }
 
+    public void getAllGroupData(String endusers){
+        DatabaseReference groupRef = databaseReference.child("user_chats");
+        DatabaseReference convRef = groupRef.child(endusers);
+
+        convRef.orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try{
+                    Object object = snapshot.getValue(Object.class);
+                    String json = new Gson().toJson(object);
+
+                    databaseCallback.getChatListCallback(new JSONObject(json));
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+    }
+
     public JSONObject getAllUserData() {
         JSONObject userData = null;
         try {
@@ -315,6 +341,8 @@ public class RealDatabaseManager {
         void databaseLoadingCallback(JSONObject result);
 
         void groupDetailCallBack(String endusers);
+
+        void getChatListCallback(JSONObject groupChatObj);
     }
 
     private DatabaseCallback databaseCallback;
