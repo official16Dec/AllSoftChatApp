@@ -61,6 +61,11 @@ public class LoginView extends AppCompatActivity {
             public void databaseLoadingCallback(JSONObject result) {
                 jsonResult = result;
             }
+
+            @Override
+            public void groupDetailCallBack(String endusers) {
+
+            }
         });
     }
 

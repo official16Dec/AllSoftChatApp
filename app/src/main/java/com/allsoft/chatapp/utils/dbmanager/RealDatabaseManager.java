@@ -2,24 +2,31 @@ package com.allsoft.chatapp.utils.dbmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.allsoft.chatapp.model.chats.UserChat;
 import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,8 +40,10 @@ public class RealDatabaseManager {
 
     private final MySharedPref mySharedPref;
 
-    public RealDatabaseManager(Context context, DatabaseCallback databaseCallback){
+    public RealDatabaseManager(Context context, DatabaseCallback databasCallback){
         mySharedPref = new MySharedPref(context);
+
+        databaseCallback = databasCallback;
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference(chatapp);
@@ -50,6 +59,29 @@ public class RealDatabaseManager {
                         String json = new Gson().toJson(object);
 
                         allDataObj = new JSONObject(json);
+
+                        if(!allDataObj.has("endusers")) {
+                            HashMap<String, Object> enduserMap = new HashMap<>();
+                            HashMap<String, Object> userMap = new HashMap<>();
+                            userMap.put("user1", new EndUser());
+                            enduserMap.put("endusers", userMap);
+                            databaseReference.updateChildren(enduserMap);
+                        }
+
+                        if(!allDataObj.has("user_chats")) {
+                            HashMap<String, Object> userChatMap = new HashMap<>();
+                            HashMap<String, Object> groupMap = new HashMap<>();
+                            HashMap<String, Object> conversationMap = new HashMap<>();
+                            UserChat userChat = new UserChat();
+                            userChat.setEndusers("");
+                            userChat.setSender(0);
+                            conversationMap.put("conversation1", userChat);
+                            groupMap.put("0V0", conversationMap);
+                            userChatMap.put("user_chats", groupMap);
+                            databaseReference.updateChildren(userChatMap);
+                        }
+
+
 
                         databaseCallback.databaseLoadingCallback(allDataObj);
 
@@ -159,12 +191,131 @@ public class RealDatabaseManager {
 
     }
 
+    public void updateGroupChat(UserChat userChat, String endUsers){
+        try{
+            try {
+                DatabaseReference userChatRef = databaseReference.child("user_chats");
+                JSONObject userChatObj = getAllData().getJSONObject("user_chats");
+                Iterator<String> groupKeys = userChatObj.keys();
+
+                String lastGroupKey = "";
+                String lastConversationKey = "";
+
+                while(groupKeys.hasNext()){
+                    String groupKey = groupKeys.next();
+                    JSONObject conversationObj = userChatObj.getJSONObject(groupKey);
+                    Iterator<String> conversationKeys = conversationObj.keys();
+
+                    while(conversationKeys.hasNext()){
+                        String conversationKey = conversationKeys.next();
+                        JSONObject chatObj = conversationObj.getJSONObject(conversationKey);
+
+                        if(chatObj.getString("endusers").equals(endUsers)){
+                            lastConversationKey = conversationKey;
+                        }
+                    }
+                    lastGroupKey = groupKey;
+                    if(!lastConversationKey.equals("")){
+                        break;
+                    }
+                }
+
+                HashMap<String, Object> conversationMap = new HashMap<>();
+                DatabaseReference groupRef = userChatRef.child(lastGroupKey);
+                conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                groupRef.updateChildren(conversationMap);
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void createGroupWithData(ArrayList<UserChat> userChatList){
+        try{
+            JSONObject userChats = allDataObj.getJSONObject("user_chats");
+            Log.d("userChatJson", userChats.toString());
+            Iterator<String> groupKeys = userChats.keys();
+
+            String lastGroupKey = "";
+            String lastConversationKey = "";
+
+            while (groupKeys.hasNext()) {
+                String groupKey = groupKeys.next();
+                JSONObject groupObj = userChats.getJSONObject(groupKey);
+                Iterator<String> conversationKeys = groupObj.keys();
+                while(conversationKeys.hasNext()){
+                    String conversationKey = conversationKeys.next();
+                    JSONObject conversationObj = groupObj.getJSONObject(conversationKey);
+                    if(conversationObj.has("endusers")){
+                        if(conversationObj.getString("endusers").equals(userChatList.get(0).getEndusers())){
+                            lastConversationKey = conversationKey;
+                        }
+                    }
+                }
+
+                lastGroupKey = groupKey;
+
+                if(!lastConversationKey.equals("")){
+                    break;
+                }
+            }
+
+
+
+            Log.d("LastConKey", lastConversationKey);
+            Log.d("groupKeys", lastGroupKey);
+
+            if(lastConversationKey.equals("")){
+                HashMap<String, Object> groupMap = new HashMap<>();
+
+                String newGroupKey = userChatList.get(0).getEndusers();
+
+                DatabaseReference chatDataRef = databaseReference.child("user_chats");
+
+                for (UserChat userChat : userChatList) {
+                    HashMap<String, Object> conversationMap = new HashMap<>();
+                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                    groupMap.put(newGroupKey, conversationMap);
+                    DatabaseReference groupPref = chatDataRef.child(newGroupKey);
+                    groupPref.updateChildren(conversationMap);
+                }
+            }
+            else{
+                DatabaseReference chatDataRef = databaseReference.child("user_chats");
+                DatabaseReference groupRef = chatDataRef.child(lastGroupKey);
+
+                for (UserChat userChat : userChatList) {
+                    HashMap<String, Object> conversationMap = new HashMap<>();
+                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                    groupRef.updateChildren(conversationMap);
+                }
+            }
+
+
+            databaseCallback.groupDetailCallBack(userChatList.get(0).getEndusers());
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     public interface DatabaseCallback{
         void databaseLoadingCallback(JSONObject result);
+
+        void groupDetailCallBack(String endusers);
     }
 
-//    private DatabaseCallback databaseCallback;
+    private DatabaseCallback databaseCallback;
 //    public void setDatabaseCallback(DatabaseCallback callback){
 //        databaseCallback = callback;
 //    }

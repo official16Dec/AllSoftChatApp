@@ -55,14 +55,14 @@ public class UserChatDetailAdapter extends RecyclerView.Adapter<UserChatDetailAd
 
         if(mySharedPref.getPrefUserId(MySharedPref.prefUserId) == groupChatList.get(position).getSender()){
             holder.senderConversation.getRoot().setVisibility(View.VISIBLE);
-            if(!groupChatList.get(position).getChat().getChatMessage().isEmpty()){
-                holder.senderConversation.chatMessage.setText(groupChatList.get(position).getChat().getChatMessage());
+            if(!groupChatList.get(position).getChat().getChat_message().isEmpty()){
+                holder.senderConversation.chatMessage.setText(groupChatList.get(position).getChat().getChat_message());
             }
         }
         else{
             holder.receiverConversation.getRoot().setVisibility(View.VISIBLE);
-            if(!groupChatList.get(position).getChat().getChatMessage().isEmpty()){
-                holder.receiverConversation.chatMessage.setText(groupChatList.get(position).getChat().getChatMessage());
+            if(!groupChatList.get(position).getChat().getChat_message().isEmpty()){
+                holder.receiverConversation.chatMessage.setText(groupChatList.get(position).getChat().getChat_message());
             }
         }
 

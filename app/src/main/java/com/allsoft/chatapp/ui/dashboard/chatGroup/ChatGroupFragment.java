@@ -2,6 +2,7 @@ package com.allsoft.chatapp.ui.dashboard.chatGroup;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import com.allsoft.chatapp.databinding.FragmentChatGroupBinding;
 import com.allsoft.chatapp.model.chats.UserChat;
@@ -77,6 +80,15 @@ public class ChatGroupFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(isEnabled()){
+                    setEnabled(false);
+                }
+            }
+        });
     }
 
     @Override
@@ -91,8 +103,6 @@ public class ChatGroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initUserChatAdapter();
-
         initViewModel();
 
         setObserver();
@@ -102,16 +112,12 @@ public class ChatGroupFragment extends Fragment {
 
     private void setObserver() {
 
-        mainViewModel.getChatGroupAdapterLiveData().observe(getViewLifecycleOwner(), stringObjectHashMap -> {
+        mainViewModel.getChatGroupAdapterLiveData().observe(getViewLifecycleOwner(), mapData -> {
 
-            if(stringObjectHashMap.containsKey("chatList")){
+            if(mapData.containsKey("chatList")){
                 setProgressVisibility(true);
-                ArrayList<UserChat> chatList = new ArrayList<>();
-                Log.d(TAG, "List is "+stringObjectHashMap.get("chatList"));
-                chatList.addAll(stringObjectHashMap.get("chatList"));
-                if (chatList.size() > 0) {
-                    userChatGroupAdapter.updateChat(chatList);
-                }
+                initUserChatAdapter();
+                userChatGroupAdapter.updateChat(mapData.get("chatList"));
             }
         });
     }
@@ -121,27 +127,24 @@ public class ChatGroupFragment extends Fragment {
     }
 
     private void initUserChatAdapter() {
-        binding.userChatRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+        binding.userGroupRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
 
-        userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), new UserChatGroupAdapter.ChatHistoryCallback() {
-            @Override
-            public void setHistoryItemClicked(UserChat userChat) {
-                HashMap mapData = new HashMap<String, Object>();
-                mapData.put("endusers", userChat.getEndUsers());
-                mainViewModel.setChatDetailLiveData(mapData);
-            }
+        userChatGroupAdapter = new UserChatGroupAdapter(requireActivity(), userChat -> {
+            HashMap<String, Object> mapData = new HashMap<>();
+            mapData.put("endusers", userChat.getEndusers());
+            mainViewModel.setChatDetailLiveData(mapData);
         });
 
-        binding.userChatRecycler.setAdapter(userChatGroupAdapter);
+        binding.userGroupRecycler.setAdapter(userChatGroupAdapter);
     }
 
     private void setProgressVisibility(boolean shouldVisible){
         if(shouldVisible){
-            binding.userChatRecycler.setVisibility(View.VISIBLE);
+            binding.userGroupRecycler.setVisibility(View.VISIBLE);
             binding.chatGroupShimmerLayout.getRoot().setVisibility(View.GONE);
         }
         else{
-            binding.userChatRecycler.setVisibility(View.GONE);
+            binding.userGroupRecycler.setVisibility(View.GONE);
             binding.chatGroupShimmerLayout.getRoot().setVisibility(View.VISIBLE);
         }
     }

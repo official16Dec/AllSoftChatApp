@@ -42,16 +42,33 @@
         app:layout_constraintGuide_percent="0.98"
         />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/userGroupRecycler"
+        android:id="@+id/userRecycler"
         android:visibility="visible"
+        android:layout_marginBottom="10dp"
         app:layout_constraintStart_toStartOf="@id/guideStart"
         app:layout_constraintEnd_toEndOf="@id/guideEnd"
         app:layout_constraintTop_toTopOf="@id/guideTop"
-        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
-        tools:listitem="@layout/item_chat_group"
+        app:layout_constraintBottom_toTopOf="@id/createGroupBtn"
+        tools:listitem="@layout/item_create_group"
+        />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/createGroupBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="10dp"
+        android:textColor="@color/white"
+        android:text="Create Group"
+        android:backgroundTint="@color/purple"
+        android:visibility="gone"
         />
 
     <include

@@ -4,13 +4,14 @@ package com.allsoft.chatapp.model.user;
 import androidx.annotation.Keep;
 
 @Keep
-public class EndUser {
-    public int user_id;
+public class EndUser implements Comparable<EndUser>{
+    private int user_id;
 
-    public String user_name;
-    public String user_mobile;
-    public String user_mail;
-    public String user_password;
+    private String user_name;
+    private String user_mobile;
+    private String user_mail;
+    private String user_password;
+    private String user_profile_pic;
 
 
 //    EndUser(int user_id, String user_name, String user_mobile, String user_mail){
@@ -54,5 +55,18 @@ public class EndUser {
     }
     public void setUser_password(String user_password){
         this.user_password = user_password;
+    }
+
+    public String getUser_profile_pic(){
+        return user_profile_pic;
+    }
+
+    public void setUser_profile_pic(String user_profile_pic){
+        this.user_profile_pic = user_profile_pic;
+    }
+
+    @Override
+    public int compareTo(EndUser endUser) {
+        return Integer.compare(this.user_id, endUser.user_id);
     }
 }
