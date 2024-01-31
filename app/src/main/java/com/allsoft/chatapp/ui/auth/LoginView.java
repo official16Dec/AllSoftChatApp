@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.allsoft.chatapp.R;
@@ -19,6 +18,8 @@ import com.allsoft.chatapp.ui.auth.fragments.SignUpFragment;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
 import com.allsoft.chatapp.ui.dashboard.MainView;
 import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
+import com.allsoft.chatapp.utils.preference.MySharedPref;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
@@ -35,10 +36,14 @@ public class LoginView extends AppCompatActivity {
 
     JSONObject jsonResult;
 
+    MySharedPref mySharedPref;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+
+        mySharedPref = new MySharedPref(this);
 
         setContentView(binding.getRoot());
 
@@ -48,11 +53,16 @@ public class LoginView extends AppCompatActivity {
 
         setObserver();
 
+        initFirebaseToken();
 
         loginViewModel.setLoginLiveData(new HashMap<>());
 
         loginViewModel.setManager(realDatabaseManager);
 
+    }
+
+    private void initFirebaseToken(){
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> mySharedPref.setPrefFcmToken(MySharedPref.prefFcmToken, task.getResult()));
     }
 
     private void initRealDatabaseManager() {

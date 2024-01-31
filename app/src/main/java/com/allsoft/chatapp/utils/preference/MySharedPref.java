@@ -9,6 +9,7 @@ public class MySharedPref {
     public static final String prefUserName = "user_name";
     public static final String prefUserMobile = "user_mobile";
     public static final String prefUserMail = "user_mail";
+    public static final String prefFcmToken = "fcm_token";
     private Context ctx;
     private SharedPreferences pref;
     private SharedPreferences.Editor writer;
@@ -34,6 +35,9 @@ public class MySharedPref {
     public String getPrefUserMail(String key) {
         return pref.getString(key, "");
     }
+    public String getPrefFcmToken(String key) {
+        return pref.getString(key, "");
+    }
 
     public void setPrefUserId(String key, int value) {
         writer.putInt(key, value);
@@ -51,6 +55,11 @@ public class MySharedPref {
     }
 
     public void setPrefUserMail(String key, String value) {
+        writer.putString(key, value);
+        writer.commit();
+    }
+
+    public void setPrefFcmToken(String key, String value) {
         writer.putString(key, value);
         writer.commit();
     }

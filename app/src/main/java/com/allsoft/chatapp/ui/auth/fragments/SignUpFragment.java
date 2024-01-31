@@ -15,6 +15,7 @@ import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.FragmentSignUpBinding;
 import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.ui.auth.viewmodel.LoginViewModel;
+import com.allsoft.chatapp.utils.preference.MySharedPref;
 
 import java.util.HashMap;
 
@@ -37,6 +38,8 @@ public class SignUpFragment extends Fragment {
     private FragmentSignUpBinding binding;
 
     private LoginViewModel loginViewModel;
+
+    MySharedPref mySharedPref;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -81,6 +84,8 @@ public class SignUpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mySharedPref = new MySharedPref(requireActivity());
+
         initViewModel();
 
         setListener();
@@ -99,6 +104,7 @@ public class SignUpFragment extends Fragment {
                 user.setUser_mail(binding.userMailEdit.getText().toString());
                 user.setUser_password(binding.userPassEdit.getText().toString());
                 user.setUser_profile_pic("");
+                user.setFcm_token(mySharedPref.getPrefFcmToken(MySharedPref.prefFcmToken));
 
                 HashMap<String, Object> mapData = new HashMap<>();
                 mapData.put("enduser", user);

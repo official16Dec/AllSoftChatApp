@@ -198,22 +198,23 @@ public class CreateGroupFragment extends Fragment {
             chatData.setChat_video("");
             userChat.setChat(chatData);
 
-            String chatTitle = "";
+            StringBuilder chatTitle = new StringBuilder();
             for (EndUser user : userListToHandle){
                 if(!endUser.getUser_name().equals(user.getUser_name())){
-                    if(chatTitle.isEmpty()){
-                        chatTitle = "to "+user.getUser_name();
+                    if(chatTitle.length() == 0){
+                        chatTitle = new StringBuilder("to " + user.getUser_name());
                     }
                     else{
-                        chatTitle = chatTitle +", "+user.getUser_name();
+                        chatTitle.append(", ").append(user.getUser_name());
                     }
                 }
             }
+
             userChat.setEndusers(endusers);
-            userChat.setChat_title(chatTitle);
+            userChat.setChat_title(chatTitle.toString());
             userChat.setSender(endUser.getUser_id());
             userChat.setChat_desc("");
-            userChat.setWhen("");
+            userChat.setWhen(String.valueOf(System.currentTimeMillis()));
 
             userChatList.add(userChat);
         }

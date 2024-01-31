@@ -12,6 +12,7 @@ public class EndUser implements Comparable<EndUser>{
     private String user_mail;
     private String user_password;
     private String user_profile_pic;
+    private String fcm_token;
 
 
 //    EndUser(int user_id, String user_name, String user_mobile, String user_mail){
@@ -63,6 +64,14 @@ public class EndUser implements Comparable<EndUser>{
 
     public void setUser_profile_pic(String user_profile_pic){
         this.user_profile_pic = user_profile_pic;
+    }
+
+    public String getFcm_token() {
+        return fcm_token;
+    }
+
+    public void setFcm_token(String fcm_token) {
+        this.fcm_token = fcm_token;
     }
 
     @Override
