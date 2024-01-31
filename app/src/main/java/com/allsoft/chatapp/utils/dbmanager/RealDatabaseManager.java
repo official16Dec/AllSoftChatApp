@@ -63,7 +63,9 @@ public class RealDatabaseManager {
                         if(!allDataObj.has("endusers")) {
                             HashMap<String, Object> enduserMap = new HashMap<>();
                             HashMap<String, Object> userMap = new HashMap<>();
-                            userMap.put("user1", new EndUser());
+                            EndUser user = new EndUser();
+                            user.setUser_id(0);
+                            userMap.put("user0", user);
                             enduserMap.put("endusers", userMap);
                             databaseReference.updateChildren(enduserMap);
                         }
@@ -222,7 +224,7 @@ public class RealDatabaseManager {
 
                 HashMap<String, Object> conversationMap = new HashMap<>();
                 DatabaseReference groupRef = userChatRef.child(lastGroupKey);
-                conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                conversationMap.put(userChat.getWhen(), userChat);
                 groupRef.updateChildren(conversationMap);
 
 
@@ -282,7 +284,7 @@ public class RealDatabaseManager {
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
-                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                    conversationMap.put(userChat.getWhen(), userChat);
                     groupMap.put(newGroupKey, conversationMap);
                     DatabaseReference groupPref = chatDataRef.child(newGroupKey);
                     groupPref.updateChildren(conversationMap);
@@ -294,7 +296,7 @@ public class RealDatabaseManager {
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
-                    conversationMap.put(String.valueOf(System.currentTimeMillis()), userChat);
+                    conversationMap.put(userChat.getWhen(), userChat);
                     groupRef.updateChildren(conversationMap);
                 }
             }

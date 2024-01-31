@@ -1,12 +1,11 @@
 package com.allsoft.chatapp.model.chats;
 
-public class UserChat {
+public class UserChat implements Comparable<UserChat>{
     private String endusers;
     private int sender;
     private String chat_desc;
     private String chat_title;
     private String when;
-
     private ChatData chat;
 
     public String getEndusers(){
@@ -55,5 +54,11 @@ public class UserChat {
 
     public void setChat(ChatData chat){
         this.chat = chat;
+    }
+
+
+    @Override
+    public int compareTo(UserChat userChat) {
+        return Integer.compare(Integer.parseInt(this.when), Integer.parseInt(userChat.when));
     }
 }
