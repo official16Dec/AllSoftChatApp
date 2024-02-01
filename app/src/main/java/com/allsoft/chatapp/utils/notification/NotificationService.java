@@ -22,11 +22,12 @@ public class NotificationService extends FirebaseMessagingService {
 
     private static final String TAG = NotificationService.class.getSimpleName();
 
-    private final MySharedPref mySharedPref = new MySharedPref(BaseApplication.newInstance().getContext());
+    private MySharedPref mySharedPref;
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         Log.d(TAG, "Refreshed token: " + token);
+        mySharedPref = new MySharedPref(BaseApplication.newInstance().getContext());
         mySharedPref.setPrefFcmToken(MySharedPref.prefFcmToken, token);
     }
 
@@ -37,23 +38,32 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
     public void sendNotification(String targetUserToken, String title, String message) {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType, "{\n\t\"to\":\"" + targetUserToken + "\",\n\t\"notification\": {\n\t\t\"title\":\"" + title + "\",\n\t\t\"body\":\"" + message + "\"\n\t}\n}");
-        Request request = new Request.Builder()
-                .url("https://fcm.googleapis.com/fcm/send")
-                .post(body)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "key=FIREBASE_SERVER_KEY")
-                .build();
-
         try {
-            Response response = client.newCall(request).execute();
-            // Handle the response if needed
-            String responseBody = response.body().string();
-            Log.d("FCM Response", responseBody);
-        } catch (IOException e) {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, "{\n\t\"to\":\"" + targetUserToken + "\",\n\t\"notification\": {\n\t\t\"title\":\"" + title + "\",\n\t\t\"body\":\"" + message + "\"\n\t}\n}");
+            Request request = new Request.Builder()
+                    .url("https://fcm.googleapis.com/fcm/send")
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "key=FIREBASE_SERVER_KEY")
+                    .build();
+
+            try {
+                Response response = client.newCall(request).execute();
+                // Handle the response if needed
+                String responseBody = response.body().string();
+                Log.d("FCM Response", responseBody);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        catch (ExceptionInInitializerError e){
             e.printStackTrace();
         }
+    }
+
+    public static NotificationService newInstance(){
+        return new NotificationService();
     }
 }
