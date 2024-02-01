@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -95,25 +96,34 @@ public class MainView extends AppCompatActivity {
             }
 
             @Override
-            public void getChatListCallback(JSONObject groupChatObj) {
+            public void getChatListCallback(ArrayList<UserChat> groupChatList) {
+//                Log.d(TAG, groupChatObj.toString());
                 try {
                     ArrayList<UserChat> userChatList = new ArrayList<>();
 
-                    Iterator<String> groupKeys = groupChatObj.keys();
-                    while(groupKeys.hasNext()){
-                        String groupKey = groupKeys.next();
-                        JSONObject conversationData = groupChatObj.getJSONObject(groupKey);
+//                    Iterator<String> groupKeys = groupChatObj.keys();
+//                    while(groupKeys.hasNext()){
+//                        String groupKey = groupKeys.next();
+//                        JSONObject conversationData = groupChatObj.getJSONObject(groupKey);
+//
+//                        if(conversationData.has("chat")){
+//                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
+//                                Gson gson = new Gson();
+//                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
+//                                userChatList.add(userChat);
+//                            }
+//                        }
+//                    }
 
-                        if(conversationData.has("chat")){
-                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
-                                Gson gson = new Gson();
-                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
+                    for(UserChat userChat : groupChatList){
+                        if(userChat.getChat() != null){
+                            if(!userChat.getChat().getChat_message().equals("")){
                                 userChatList.add(userChat);
                             }
                         }
                     }
 
-                    Log.d(TAG, "Size is "+userChatList.size());
+
                     HashMap<String, ArrayList<UserChat>> chatHistoryData = new HashMap<>();
                     chatHistoryData.put("chatList", userChatList);
                     mainViewModel.setChatDetailAdapterLiveData(chatHistoryData);

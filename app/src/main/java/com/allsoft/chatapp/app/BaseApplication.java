@@ -3,6 +3,8 @@ package com.allsoft.chatapp.app;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.firebase.FirebaseApp;
+
 public class BaseApplication extends Application {
     private Context mContext;
 
@@ -19,5 +21,7 @@ public class BaseApplication extends Application {
         super.onCreate();
 
         mContext = this;
+
+        FirebaseApp.initializeApp(this);
     }
 }

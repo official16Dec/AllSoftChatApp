@@ -1,9 +1,6 @@
 package com.allsoft.chatapp.utils.dbmanager;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -15,18 +12,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -86,8 +79,6 @@ public class RealDatabaseManager {
 
 
                         databaseCallback.databaseLoadingCallback(allDataObj);
-
-//                        Log.d(TAG, "All Value"+allDataObj.getJSONObject("endusers"));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -180,17 +171,22 @@ public class RealDatabaseManager {
     }
 
     public void getAllGroupData(String endusers){
-        DatabaseReference groupRef = databaseReference.child("user_chats");
-        DatabaseReference convRef = groupRef.child(endusers);
 
-        convRef.orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference convRef = FirebaseDatabase.getInstance().getReference().child("chat_app/user_chats/"+endusers);
+
+        convRef.orderByValue().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 try{
-                    Object object = snapshot.getValue(Object.class);
-                    String json = new Gson().toJson(object);
 
-                    databaseCallback.getChatListCallback(new JSONObject(json));
+                    ArrayList<UserChat> groupChatList = new ArrayList<>();
+
+                    for(DataSnapshot childSnapShot : snapshot.getChildren()){
+                        UserChat userChat = childSnapShot.getValue(UserChat.class);
+                        groupChatList.add(userChat);
+                    }
+
+                    databaseCallback.getChatListCallback(groupChatList);
 
                 }
                 catch (Exception e){
@@ -221,43 +217,10 @@ public class RealDatabaseManager {
 
     public void updateGroupChat(UserChat userChat, String endUsers){
         try{
-            try {
-                DatabaseReference userChatRef = databaseReference.child("user_chats");
-                JSONObject userChatObj = getAllData().getJSONObject("user_chats");
-                Iterator<String> groupKeys = userChatObj.keys();
-
-                String lastGroupKey = "";
-                String lastConversationKey = "";
-
-                while(groupKeys.hasNext()){
-                    String groupKey = groupKeys.next();
-                    JSONObject conversationObj = userChatObj.getJSONObject(groupKey);
-                    Iterator<String> conversationKeys = conversationObj.keys();
-
-                    while(conversationKeys.hasNext()){
-                        String conversationKey = conversationKeys.next();
-                        JSONObject chatObj = conversationObj.getJSONObject(conversationKey);
-
-                        if(chatObj.getString("endusers").equals(endUsers)){
-                            lastConversationKey = conversationKey;
-                        }
-                    }
-                    lastGroupKey = groupKey;
-                    if(!lastConversationKey.equals("")){
-                        break;
-                    }
-                }
-
-                HashMap<String, Object> conversationMap = new HashMap<>();
-                DatabaseReference groupRef = userChatRef.child(lastGroupKey);
-                conversationMap.put(userChat.getWhen(), userChat);
-                groupRef.updateChildren(conversationMap);
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("chat_app/user_chats/"+endUsers);
+            HashMap<String, Object> conversationMap = new HashMap<>();
+            conversationMap.put(userChat.getWhen(), userChat);
+            groupRef.updateChildren(conversationMap);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -269,7 +232,6 @@ public class RealDatabaseManager {
     public void createGroupWithData(ArrayList<UserChat> userChatList){
         try{
             JSONObject userChats = allDataObj.getJSONObject("user_chats");
-            Log.d("userChatJson", userChats.toString());
             Iterator<String> groupKeys = userChats.keys();
 
             String lastGroupKey = "";
@@ -302,23 +264,18 @@ public class RealDatabaseManager {
             Log.d("groupKeys", lastGroupKey);
 
             if(lastConversationKey.equals("")){
-                HashMap<String, Object> groupMap = new HashMap<>();
-
                 String newGroupKey = userChatList.get(0).getEndusers();
 
-                DatabaseReference chatDataRef = databaseReference.child("user_chats");
+                DatabaseReference groupPref = FirebaseDatabase.getInstance().getReference().child("chat_app/user_chats/"+newGroupKey);
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
                     conversationMap.put(userChat.getWhen(), userChat);
-                    groupMap.put(newGroupKey, conversationMap);
-                    DatabaseReference groupPref = chatDataRef.child(newGroupKey);
                     groupPref.updateChildren(conversationMap);
                 }
             }
             else{
-                DatabaseReference chatDataRef = databaseReference.child("user_chats");
-                DatabaseReference groupRef = chatDataRef.child(lastGroupKey);
+                DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("chat_app/user_chats/"+lastGroupKey);
 
                 for (UserChat userChat : userChatList) {
                     HashMap<String, Object> conversationMap = new HashMap<>();
@@ -342,11 +299,8 @@ public class RealDatabaseManager {
 
         void groupDetailCallBack(String endusers);
 
-        void getChatListCallback(JSONObject groupChatObj);
+        void getChatListCallback(ArrayList<UserChat> groupChatList);
     }
 
     private DatabaseCallback databaseCallback;
-//    public void setDatabaseCallback(DatabaseCallback callback){
-//        databaseCallback = callback;
-//    }
 }
