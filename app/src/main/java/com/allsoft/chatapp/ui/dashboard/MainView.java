@@ -1,13 +1,20 @@
 package com.allsoft.chatapp.ui.dashboard;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -24,15 +31,22 @@ import com.allsoft.chatapp.ui.dashboard.chatGroup.ChatGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.creategroup.CreateGroupFragment;
 import com.allsoft.chatapp.ui.dashboard.viewmodel.MainViewModel;
 import com.allsoft.chatapp.utils.dbmanager.RealDatabaseManager;
+import com.allsoft.chatapp.utils.firebaseStorage.FirebaseStorageManager;
+import com.allsoft.chatapp.utils.notification.NotificationService;
 import com.allsoft.chatapp.utils.preference.MySharedPref;
 import com.google.gson.Gson;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class MainView extends AppCompatActivity {
 
@@ -44,6 +58,13 @@ public class MainView extends AppCompatActivity {
     private MySharedPref mySharedPref;
 
     private RealDatabaseManager realDatabaseManager;
+
+    private FirebaseStorageManager firebaseStorageManager;
+
+    private ActivityResultLauncher<Intent> pickImageLauncher;
+
+    private UserChat pickImageUserChat;
+    private String pickImageEndUsers;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +80,38 @@ public class MainView extends AppCompatActivity {
 
         refreshGroups();
 
+        initStorage();
+
         mainViewModel.setChatGroupLiveData(new HashMap<>());
 
         setListener();
 
+        pickImageResultLauncher();
+
+    }
+
+    private void pickImageResultLauncher() {
+        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        // Handle the result here
+                        Intent data = result.getData();
+                        if (data != null && data.getData() != null) {
+                            Uri selectedImageUri = data.getData();
+                            firebaseStorageManager.addImageToStorage(selectedImageUri);
+                        }
+                    }
+                });
+    }
+
+    private void initStorage() {
+        firebaseStorageManager = new FirebaseStorageManager(new FirebaseStorageManager.StorageActivityCallback() {
+            @Override
+            public void onImageUploaded(String downloadUrl) {
+                pickImageUserChat.getChat().setChat_image(downloadUrl);
+                updateGroupChat(pickImageUserChat, pickImageEndUsers);
+            }
+        });
     }
 
     private void setListener() {
@@ -97,23 +146,9 @@ public class MainView extends AppCompatActivity {
 
             @Override
             public void getChatListCallback(ArrayList<UserChat> groupChatList) {
-//                Log.d(TAG, groupChatObj.toString());
+
                 try {
                     ArrayList<UserChat> userChatList = new ArrayList<>();
-
-//                    Iterator<String> groupKeys = groupChatObj.keys();
-//                    while(groupKeys.hasNext()){
-//                        String groupKey = groupKeys.next();
-//                        JSONObject conversationData = groupChatObj.getJSONObject(groupKey);
-//
-//                        if(conversationData.has("chat")){
-//                            if(!conversationData.getJSONObject("chat").getString("chat_message").equals("")){
-//                                Gson gson = new Gson();
-//                                UserChat userChat = gson.fromJson(conversationData.toString(), UserChat.class);
-//                                userChatList.add(userChat);
-//                            }
-//                        }
-//                    }
 
                     for(UserChat userChat : groupChatList){
                         if(userChat.getChat() != null){
@@ -128,6 +163,21 @@ public class MainView extends AppCompatActivity {
                     chatHistoryData.put("chatList", userChatList);
                     mainViewModel.setChatDetailAdapterLiveData(chatHistoryData);
 
+                    //Sending notification
+                    String[] users = userChatList.get(0).getEndusers().split("V");
+                    if(users.length >1){
+                        if(Integer.parseInt(users[0])!=mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
+                            HashMap<String, Object> userMap = new HashMap<>();
+                            userMap.put("enduser", realDatabaseManager.getEndUserById(Integer.parseInt(users[0])));
+//                            mainViewModel.setNotificationLiveData(userMap);
+                        }
+
+                        if(Integer.parseInt(users[1])!=mySharedPref.getPrefUserId(MySharedPref.prefUserId)){
+                            HashMap<String, Object> userMap = new HashMap<>();
+                            userMap.put("enduser", realDatabaseManager.getEndUserById(Integer.parseInt(users[1])));
+//                            mainViewModel.setNotificationLiveData(userMap);
+                        }
+                    }
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -260,6 +310,24 @@ public class MainView extends AppCompatActivity {
             }
         });
 
+        mainViewModel.getNotificationLiveData().observe(this, mapData->{
+            if(mapData.containsKey("enduser")){
+                EndUser endUser = (EndUser) mapData.get("enduser");
+                NotificationService.newInstance().sendNotification(endUser.getFcm_token(), "New message received", "New message received");
+            }
+        });
+
+        mainViewModel.getPickImageLiveData().observe(this, new Observer<HashMap<String, Object>>() {
+            @Override
+            public void onChanged(HashMap<String, Object> mapData) {
+                if(mapData.containsKey("user_chat")){
+                    pickImageUserChat = (UserChat) mapData.get("user_chat");
+                    pickImageEndUsers = String.valueOf(mapData.get("endusers"));
+                    checkForStoragePermission();
+                }
+            }
+        });
+
     }
 
     private void getGroupConversation(String endusers) {
@@ -316,5 +384,57 @@ public class MainView extends AppCompatActivity {
 
     private void updateGroupChat(UserChat userChat, String endusers){
         realDatabaseManager.updateGroupChat(userChat, endusers);
+    }
+
+
+    private void checkForStoragePermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                // Request permissions if not granted
+                askForStoragePermission();
+            } else {
+                // Permissions already granted, proceed with your logic
+                pickImage();
+            }
+        } else {
+            // Permissions are not required for lower Android versions
+            pickImage();
+        }
+    }
+    private void askForStoragePermission(){
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        // Check if all permissions are granted
+                        if (report.areAllPermissionsGranted()) {
+                            pickImage();
+                        } else {
+                            // Handle case when some permissions are denied
+//                            handleDeniedPermissions(report.getDeniedPermissionResponses());
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        // Handle permission rationale if needed
+                        // You can show a dialog explaining why the permission is necessary and ask the user to grant it
+                        token.continuePermissionRequest();
+                    }
+                })
+                .check();
+    }
+
+    private void pickImage(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
     }
 }

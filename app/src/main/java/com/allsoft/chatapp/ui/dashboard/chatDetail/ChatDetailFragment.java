@@ -197,6 +197,32 @@ public class ChatDetailFragment extends Fragment {
 
             }
         });
+
+        binding.cameraBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserChat userChat = new UserChat();
+
+                ChatData chatData = new ChatData();
+                chatData.setChat_audio("");
+                chatData.setChat_file("");
+                chatData.setChat_image("");
+                chatData.setChat_message("");
+                chatData.setChat_video("");
+
+                userChat.setChat(chatData);
+                userChat.setChat_title(mParam2);
+                userChat.setChat_desc("");
+                userChat.setEndusers(mParam1);
+                userChat.setSender(mySharedPref.getPrefUserId(MySharedPref.prefUserId));
+                userChat.setWhen(String.valueOf(System.currentTimeMillis()));
+
+                HashMap<String, Object> mapData = new HashMap<>();
+                mapData.put("user_chat", userChat);
+                mapData.put("endusers", mParam1);
+                mainViewModel.setPickImageLiveData(mapData);
+            }
+        });
     }
 
     private void initRecyclerAdapter() {
@@ -214,13 +240,14 @@ public class ChatDetailFragment extends Fragment {
     }
 
     private void setObserver() {
-        mainViewModel.getChatDetailAdapterLiveData().observe(getViewLifecycleOwner(), new Observer<HashMap<String, ArrayList<UserChat>>>() {
-            @Override
-            public void onChanged(HashMap<String, ArrayList<UserChat>> mapData) {
-                if(mapData.containsKey("chatList")){
-                    initRecyclerAdapter();
-                    userChatDetailAdapter.updateChat(mapData.get("chatList"));
-                }
+        mainViewModel.getChatDetailAdapterLiveData().observe(getViewLifecycleOwner(), mapData -> {
+            if(mapData.containsKey("chatList")){
+                initRecyclerAdapter();
+                ArrayList<UserChat> userChatList = new ArrayList<>();
+                userChatList.addAll(mapData.get("chatList"));
+                userChatDetailAdapter.updateChat(userChatList);
+                binding.userChatRecycler.smoothScrollToPosition(userChatList.size()-1);
+
             }
         });
     }

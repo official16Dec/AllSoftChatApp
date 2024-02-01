@@ -124,4 +124,26 @@ public class MainViewModel extends ViewModel {
     public void setUserGroupLiveData(HashMap<String, ArrayList<UserChat>> groupChat){
         userGroupLiveData.setValue(groupChat);
     }
+
+
+    private final MutableLiveData<HashMap<String, Object>> sendNotificationLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getNotificationLiveData(){
+        return sendNotificationLiveData;
+    }
+
+    public void setNotificationLiveData(HashMap<String, Object> mapData){
+        sendNotificationLiveData.setValue(mapData);
+    }
+
+
+    private final MutableLiveData<HashMap<String, Object>> pickImageLiveData = new MutableLiveData<>();
+
+    public LiveData<HashMap<String, Object>> getPickImageLiveData(){
+        return pickImageLiveData;
+    }
+
+    public void setPickImageLiveData(HashMap<String, Object> mapData){
+        pickImageLiveData.setValue(mapData);
+    }
 }
