@@ -180,6 +180,7 @@ public class ChatDetailFragment extends Fragment {
 
                 userChat.setChat(chatData);
                 userChat.setChat_title(mParam2);
+                userChat.setChat_desc("");
                 userChat.setEndusers(mParam1);
                 userChat.setSender(mySharedPref.getPrefUserId(MySharedPref.prefUserId));
                 userChat.setWhen(String.valueOf(System.currentTimeMillis()));

@@ -188,6 +188,7 @@ public class CreateGroupFragment extends Fragment {
         Log.d("endusers", endusers);
         ArrayList<UserChat> userChatList = new ArrayList<>();
 
+        int secondVal = 0;
         for (EndUser endUser : userListToHandle){
             UserChat userChat = new UserChat();
             ChatData chatData = new ChatData();
@@ -214,9 +215,10 @@ public class CreateGroupFragment extends Fragment {
             userChat.setChat_title(chatTitle.toString());
             userChat.setSender(endUser.getUser_id());
             userChat.setChat_desc("");
-            userChat.setWhen(String.valueOf(System.currentTimeMillis()));
+            userChat.setWhen(String.valueOf(System.currentTimeMillis()+(1000L *secondVal)));
 
             userChatList.add(userChat);
+            secondVal++;
         }
 
         HashMap<String, ArrayList<UserChat>> userGroupMap = new HashMap<>();

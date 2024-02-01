@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.allsoft.chatapp.R;
 import com.allsoft.chatapp.databinding.ActivityLoginBinding;
+import com.allsoft.chatapp.model.chats.UserChat;
 import com.allsoft.chatapp.model.user.EndUser;
 import com.allsoft.chatapp.ui.auth.fragments.LoginFragment;
 import com.allsoft.chatapp.ui.auth.fragments.SignUpFragment;
@@ -23,6 +24,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -78,7 +80,7 @@ public class LoginView extends AppCompatActivity {
             }
 
             @Override
-            public void getChatListCallback(JSONObject groupChatObj) {
+            public void getChatListCallback(ArrayList<UserChat> groupChatList) {
 
             }
         });
